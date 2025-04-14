@@ -1,7 +1,12 @@
 #include "AddressBookModel.h"
+#include "util.h"
+
 
 AddressBookModel::AddressBookModel(QObject* parent)
-    : QAbstractTableModel(parent) {}
+    : QAbstractTableModel(parent)
+{
+    m_entries = loadAddressBookFromJson("testAddressBookData.json");
+}
 
 int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
     return m_entries.size();

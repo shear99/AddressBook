@@ -27,6 +27,8 @@ public:
 
 private:
     QVector<AddressEntry> m_entries;
+    bool m_favorite = false;
+
 };
 
 #endif // ADDRESSBOOKMODEL_H

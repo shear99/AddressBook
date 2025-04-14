@@ -28,6 +28,7 @@ public:
     QString company() const { return m_company; }
     QString position() const { return m_position; }
     QString nickname() const { return m_nickname; }
+    bool favorite() const { return m_favorite; }
 
     // Setters
     void setName(const QString& name) { m_name = name; }
@@ -36,6 +37,7 @@ public:
     void setCompany(const QString& company) { m_company = company; }
     void setPosition(const QString& position) { m_position = position; }
     void setNickname(const QString& nickname) { m_nickname = nickname; }
+    void setFavorite(bool favorite) { m_favorite = favorite; }
 
 private:
     QString m_name;
@@ -44,6 +46,8 @@ private:
     QString m_company;
     QString m_position;
     QString m_nickname;
+    bool m_favorite = false;
+
 };
 
 #endif // ADDRESSENTRY_H
