@@ -5,29 +5,72 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QVector>
+#include <QList>
 #include <QDebug>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QEventLoop>
+#include <QUrl>
+#include <QProcessEnvironment>
 #include "AddressEntry.h"
 
-/// JSON 파일에서 주소록 불러오기
-inline QVector<AddressEntry> loadAddressBookFromJson(const QString& filePath) {
-    QVector<AddressEntry> entries;
+/// Lambda URL을 환경 변수에서 가져오기
+inline QUrl getAwsLoadUrl() {
+    return QUrl(QString::fromUtf8(qgetenv("AWS_LAMBDA_LOAD_URL")));
+}
 
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("JSON 파일 열기 실패: %s", qUtf8Printable(file.errorString()));
+inline QUrl getAwsSaveUrl() {
+    return QUrl(QString::fromUtf8(qgetenv("AWS_LAMBDA_SAVE_URL")));
+}
+
+/// AWS Lambda를 통해 주소록 데이터를 불러오기
+inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
+    QList<AddressEntry> entries;
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request(url);
+    qDebug() << "[LOAD] Requesting GET from:" << url.toString();
+
+    QNetworkReply *reply = manager.get(request);
+
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning() << "[LOAD] Network error:" << reply->errorString();
+        reply->deleteLater();
         return entries;
     }
 
-    QByteArray jsonData = file.readAll();
+    QByteArray jsonData = reply->readAll();
+    qDebug() << "[LOAD] Raw response:" << jsonData;
+    reply->deleteLater();
+
     QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    if (!doc.isArray()) {
-        qWarning("JSON 루트가 배열이 아님");
+    QJsonArray jsonArray;
+
+    // JSON 구조가 { "results": [ ... ] } 인 경우 처리
+    if (doc.isObject()) {
+        QJsonObject rootObj = doc.object();
+        if (rootObj.contains("results") && rootObj["results"].isArray()) {
+            jsonArray = rootObj["results"].toArray();
+        } else {
+            qWarning() << "[LOAD] 'results' key not found or not an array.";
+            return entries;
+        }
+    }
+    // 최상위가 배열인 경우 지원
+    else if (doc.isArray()) {
+        jsonArray = doc.array();
+    }
+    else {
+        qWarning() << "[LOAD] JSON root is neither an object nor an array.";
         return entries;
     }
 
-    QJsonArray jsonArray = doc.array();
-    for (const QJsonValue& value : jsonArray) {
+    for (const QJsonValue &value : jsonArray) {
         if (!value.isObject()) continue;
 
         QJsonObject obj = value.toObject();
@@ -42,13 +85,14 @@ inline QVector<AddressEntry> loadAddressBookFromJson(const QString& filePath) {
         entries.append(entry);
     }
 
+    qDebug() << "[LOAD] Parsed entry count:" << entries.size();
     return entries;
 }
 
-/// 주소록을 JSON 파일로 저장
-inline bool saveAddressBookToJson(const QVector<AddressEntry>& entries, const QString& filePath) {
+/// AWS Lambda를 통해 주소록 데이터를 저장하기
+inline bool saveAddressBookToAWS(const QList<AddressEntry> &entries, const QUrl &url) {
     QJsonArray array;
-    for (const AddressEntry& entry : entries) {
+    for (const AddressEntry &entry : entries) {
         QJsonObject obj;
         obj["name"] = entry.name();
         obj["phoneNumber"] = entry.phoneNumber();
@@ -60,15 +104,34 @@ inline bool saveAddressBookToJson(const QVector<AddressEntry>& entries, const QS
         array.append(obj);
     }
 
-    QJsonDocument doc(array);
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        qWarning("JSON 파일 쓰기 실패: %s", qUtf8Printable(file.errorString()));
+    // 배열을 "results"라는 키로 감싸기
+    QJsonObject rootObj;
+    rootObj["results"] = array;
+    QJsonDocument doc(rootObj);
+    QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
+
+    qDebug() << "[SAVE] Posting to:" << url.toString();
+    //qDebug() << "[SAVE] JSON Payload:\n" << jsonData;
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply *reply = manager.post(request, jsonData);
+
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning() << "[SAVE] Failed to save data to AWS:" << reply->errorString();
+        reply->deleteLater();
         return false;
     }
 
-    file.write(doc.toJson(QJsonDocument::Indented));
-    file.close();
+    QByteArray responseData = reply->readAll();
+    qDebug() << "[SAVE] Server response:" << responseData;
+    reply->deleteLater();
     return true;
 }
 

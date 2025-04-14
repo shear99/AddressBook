@@ -6,9 +6,8 @@
 AddressBookModel::AddressBookModel(QObject* parent)
     : QAbstractTableModel(parent)
 {
-    // JSON 파일 경로를 저장하고, 해당 파일에서 데이터를 읽어옴
-    m_filePath = "C:/Users/1-22/Documents/QT/AddressBook/testAddressBookData.json";
-    m_entries = loadAddressBookFromJson(m_filePath);
+    // AWS Lambda를 통해 주소록 데이터를 로드
+    m_entries = loadAddressBookFromAWS(getAwsLoadUrl());
 }
 
 int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
@@ -23,7 +22,7 @@ QVariant AddressBookModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid() || index.row() >= m_entries.size() || role != Qt::DisplayRole)
         return QVariant();
 
-    const AddressEntry& entry = m_entries[index.row()];
+    const AddressEntry& entry = m_entries.at(index.row());
 
     switch (index.column()) {
     case 0: return entry.name();
@@ -51,7 +50,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         default: return QVariant();
         }
     } else {
-        return section + 1; // row numbers
+        return section + 1;
     }
 }
 
@@ -72,9 +71,8 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
 
     emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
 
-    // 수정된 데이터를 JSON 파일에 저장
-    if(!saveAddressBookToJson(m_entries, m_filePath)) {
-        qWarning("Failed to save data to JSON file.");
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
     }
 
     return true;
@@ -83,7 +81,6 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
 Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const {
     if (!index.isValid())
         return Qt::NoItemFlags;
-
     return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
 }
 
@@ -92,30 +89,27 @@ void AddressBookModel::addEntry(const AddressEntry& entry) {
     m_entries.append(entry);
     endInsertRows();
 
-    // 새 엔트리 추가 후 저장
-    if(!saveAddressBookToJson(m_entries, m_filePath)) {
-        qWarning("Failed to save data to JSON file.");
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
     }
 }
 
 void AddressBookModel::removeEntry(int row) {
     if (row < 0 || row >= m_entries.size())
         return;
-
     beginRemoveRows(QModelIndex(), row, row);
     m_entries.removeAt(row);
     endRemoveRows();
 
-    // 삭제 후 저장
-    if(!saveAddressBookToJson(m_entries, m_filePath)) {
-        qWarning("Failed to save data to JSON file.");
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
     }
 }
 
 AddressEntry AddressBookModel::getEntry(int row) const {
     if (row < 0 || row >= m_entries.size())
         return AddressEntry();
-    return m_entries[row];
+    return m_entries.at(row);
 }
 
 void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
@@ -125,19 +119,17 @@ void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
     m_entries[row] = entry;
     emit dataChanged(index(row, 0), index(row, columnCount() - 1));
 
-    // 업데이트 후 저장
-    if(!saveAddressBookToJson(m_entries, m_filePath)) {
-        qWarning("Failed to save data to JSON file.");
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
     }
 }
 
-void AddressBookModel::setEntries(const QVector<AddressEntry>& entries) {
+void AddressBookModel::setEntries(const QList<AddressEntry>& entries) {
     beginResetModel();
     m_entries = entries;
     endResetModel();
 
-    // 전체 데이터 세팅 후 저장
-    if(!saveAddressBookToJson(m_entries, m_filePath)) {
-        qWarning("Failed to save data to JSON file.");
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
     }
 }

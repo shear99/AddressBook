@@ -2,8 +2,9 @@
 #define ADDRESSBOOKMODEL_H
 
 #include <QAbstractTableModel>
-#include <QVector>
+#include <QList>
 #include <QString>
+#include <QUrl>
 #include "AddressEntry.h"
 
 class AddressBookModel : public QAbstractTableModel {
@@ -25,11 +26,12 @@ public:
     void removeEntry(int row);
     AddressEntry getEntry(int row) const;
     void updateEntry(int row, const AddressEntry& entry);
-    void setEntries(const QVector<AddressEntry>& entries);
+    void setEntries(const QList<AddressEntry>& entries);
 
 private:
-    QVector<AddressEntry> m_entries;
-    QString m_filePath;  // JSON 파일 경로를 저장하는 멤버 변수 추가
+    QList<AddressEntry> m_entries;
+    QUrl m_loadUrl;
+    QUrl m_saveUrl;
 };
 
 #endif // ADDRESSBOOKMODEL_H
