@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
+#include <QString>
 #include "AddressEntry.h"
 
 class AddressBookModel : public QAbstractTableModel {
@@ -24,14 +25,11 @@ public:
     void removeEntry(int row);
     AddressEntry getEntry(int row) const;
     void updateEntry(int row, const AddressEntry& entry);
-
-    //
     void setEntries(const QVector<AddressEntry>& entries);
 
 private:
     QVector<AddressEntry> m_entries;
-    bool m_favorite = false;
-
+    QString m_filePath;  // JSON 파일 경로를 저장하는 멤버 변수 추가
 };
 
 #endif // ADDRESSBOOKMODEL_H

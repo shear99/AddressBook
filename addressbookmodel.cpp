@@ -1,15 +1,14 @@
 #include <QCoreApplication>
 #include <QDir>
-
 #include "AddressBookModel.h"
 #include "util.h"
-
 
 AddressBookModel::AddressBookModel(QObject* parent)
     : QAbstractTableModel(parent)
 {
-    QString path = "C:/Users/1-22/Documents/QT/AddressBook/testAddressBookData.json";
-    m_entries = loadAddressBookFromJson(path);
+    // JSON 파일 경로를 저장하고, 해당 파일에서 데이터를 읽어옴
+    m_filePath = "C:/Users/1-22/Documents/QT/AddressBook/testAddressBookData.json";
+    m_entries = loadAddressBookFromJson(m_filePath);
 }
 
 int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
@@ -72,6 +71,12 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
     }
 
     emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+
+    // 수정된 데이터를 JSON 파일에 저장
+    if(!saveAddressBookToJson(m_entries, m_filePath)) {
+        qWarning("Failed to save data to JSON file.");
+    }
+
     return true;
 }
 
@@ -86,6 +91,11 @@ void AddressBookModel::addEntry(const AddressEntry& entry) {
     beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
     m_entries.append(entry);
     endInsertRows();
+
+    // 새 엔트리 추가 후 저장
+    if(!saveAddressBookToJson(m_entries, m_filePath)) {
+        qWarning("Failed to save data to JSON file.");
+    }
 }
 
 void AddressBookModel::removeEntry(int row) {
@@ -95,6 +105,11 @@ void AddressBookModel::removeEntry(int row) {
     beginRemoveRows(QModelIndex(), row, row);
     m_entries.removeAt(row);
     endRemoveRows();
+
+    // 삭제 후 저장
+    if(!saveAddressBookToJson(m_entries, m_filePath)) {
+        qWarning("Failed to save data to JSON file.");
+    }
 }
 
 AddressEntry AddressBookModel::getEntry(int row) const {
@@ -109,10 +124,20 @@ void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
 
     m_entries[row] = entry;
     emit dataChanged(index(row, 0), index(row, columnCount() - 1));
+
+    // 업데이트 후 저장
+    if(!saveAddressBookToJson(m_entries, m_filePath)) {
+        qWarning("Failed to save data to JSON file.");
+    }
 }
 
 void AddressBookModel::setEntries(const QVector<AddressEntry>& entries) {
     beginResetModel();
     m_entries = entries;
     endResetModel();
+
+    // 전체 데이터 세팅 후 저장
+    if(!saveAddressBookToJson(m_entries, m_filePath)) {
+        qWarning("Failed to save data to JSON file.");
+    }
 }
