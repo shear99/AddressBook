@@ -1,0 +1,272 @@
+[
+  {
+    "name": "김민준",
+    "phoneNumber": "010-1234-5678",
+    "email": "minjun.kim@example.com",
+    "company": "삼성전자",
+    "position": "연구원",
+    "nickname": "MJ",
+    "favorite": true
+  },
+  {
+    "name": "이서연",
+    "phoneNumber": "010-8765-4321",
+    "email": "seoyeon.lee@example.com",
+    "company": "네이버",
+    "position": "디자이너",
+    "nickname": "서니",
+    "favorite": false
+  },
+  {
+    "name": "박지훈",
+    "phoneNumber": "010-1122-3344",
+    "email": "jihun.park@example.com",
+    "company": "카카오",
+    "position": "백엔드 개발자",
+    "nickname": "지훈이",
+    "favorite": false
+  },
+  {
+    "name": "최유진",
+    "phoneNumber": "010-5566-7788",
+    "email": "yujin.choi@example.com",
+    "company": "LG전자",
+    "position": "PM",
+    "nickname": "유지니",
+    "favorite": true
+  },
+  {
+    "name": "정하늘",
+    "phoneNumber": "010-1010-2020",
+    "email": "haneul.jung@example.com",
+    "company": "배달의민족",
+    "position": "기획자",
+    "nickname": "하니",
+    "favorite": false
+  },
+  {
+    "name": "홍길동",
+    "phoneNumber": "010-9999-8888",
+    "email": "hong.gildong@example.com",
+    "company": "무직",
+    "position": "전설",
+    "nickname": "길동이",
+    "favorite": true
+  },
+  {
+    "name": "김서현",
+    "phoneNumber": "010-4545-5656",
+    "email": "seohyun.kim@example.com",
+    "company": "KT",
+    "position": "인프라 엔지니어",
+    "nickname": "현이",
+    "favorite": false
+  },
+  {
+    "name": "윤지호",
+    "phoneNumber": "010-3333-4444",
+    "email": "jiho.yoon@example.com",
+    "company": "SK하이닉스",
+    "position": "하드웨어 개발자",
+    "nickname": "지호",
+    "favorite": false
+  },
+  {
+    "name": "장민서",
+    "phoneNumber": "010-6677-8899",
+    "email": "minseo.jang@example.com",
+    "company": "라인플러스",
+    "position": "프론트엔드 개발자",
+    "nickname": "서미니",
+    "favorite": true
+  },
+  {
+    "name": "한지민",
+    "phoneNumber": "010-2222-3333",
+    "email": "jimin.han@example.com",
+    "company": "넷마블",
+    "position": "UI/UX 디자이너",
+    "nickname": "지미니",
+    "favorite": false
+  },
+  {
+    "name": "오세훈",
+    "phoneNumber": "010-1231-4567",
+    "email": "sehun.oh@example.com",
+    "company": "현대자동차",
+    "position": "자동차 설계자",
+    "nickname": "훈이",
+    "favorite": true
+  },
+  {
+    "name": "이하늘",
+    "phoneNumber": "010-7890-1234",
+    "email": "haneul.lee@example.com",
+    "company": "스타트업XYZ",
+    "position": "CEO",
+    "nickname": "하늘이",
+    "favorite": true
+  },
+  {
+    "name": "문지후",
+    "phoneNumber": "010-5656-7878",
+    "email": "jihoo.moon@example.com",
+    "company": "한화시스템",
+    "position": "시스템 개발자",
+    "nickname": "후지",
+    "favorite": false
+  },
+  {
+    "name": "강예린",
+    "phoneNumber": "010-2323-3434",
+    "email": "yerin.kang@example.com",
+    "company": "쿠팡",
+    "position": "물류 관리자",
+    "nickname": "예리",
+    "favorite": false
+  },
+  {
+    "name": "배준호",
+    "phoneNumber": "010-7777-8888",
+    "email": "junho.bae@example.com",
+    "company": "CJ ENM",
+    "position": "영상편집자",
+    "nickname": "준호형",
+    "favorite": true
+  },
+  {
+    "name": "임하진",
+    "phoneNumber": "010-8888-9999",
+    "email": "hajin.lim@example.com",
+    "company": "SBS",
+    "position": "PD",
+    "nickname": "하찌",
+    "favorite": false
+  },
+  {
+    "name": "노지민",
+    "phoneNumber": "010-1212-3434",
+    "email": "jimin.noh@example.com",
+    "company": "롯데",
+    "position": "마케팅팀",
+    "nickname": "민지",
+    "favorite": false
+  },
+  {
+    "name": "류태양",
+    "phoneNumber": "010-5656-9898",
+    "email": "taeyang.ryu@example.com",
+    "company": "솔라테크",
+    "position": "에너지 엔지니어",
+    "nickname": "태양이",
+    "favorite": true
+  },
+  {
+    "name": "서지우",
+    "phoneNumber": "010-3456-7890",
+    "email": "jiwoo.seo@example.com",
+    "company": "대한항공",
+    "position": "승무원",
+    "nickname": "지우쨩",
+    "favorite": true
+  },
+  {
+    "name": "신도윤",
+    "phoneNumber": "010-8881-9992",
+    "email": "doyoon.shin@example.com",
+    "company": "농심",
+    "position": "품질관리자",
+    "nickname": "윤도",
+    "favorite": false
+  },
+  {
+    "name": "안소희",
+    "phoneNumber": "010-6666-5555",
+    "email": "sohee.ahn@example.com",
+    "company": "빙그레",
+    "position": "제품 디자이너",
+    "nickname": "소소",
+    "favorite": true
+  },
+  {
+    "name": "남윤서",
+    "phoneNumber": "010-1011-2022",
+    "email": "yoonseo.nam@example.com",
+    "company": "SK텔레콤",
+    "position": "데이터 분석가",
+    "nickname": "윤서",
+    "favorite": false
+  },
+  {
+    "name": "백예린",
+    "phoneNumber": "010-1233-4567",
+    "email": "yerin.baek@example.com",
+    "company": "멜론",
+    "position": "음악 큐레이터",
+    "nickname": "예린이",
+    "favorite": true
+  },
+  {
+    "name": "양지훈",
+    "phoneNumber": "010-9090-8080",
+    "email": "jihun.yang@example.com",
+    "company": "NHN",
+    "position": "보안 엔지니어",
+    "nickname": "지훈쓰",
+    "favorite": false
+  },
+  {
+    "name": "조하영",
+    "phoneNumber": "010-3434-4545",
+    "email": "hayoung.jo@example.com",
+    "company": "LG유플러스",
+    "position": "고객상담사",
+    "nickname": "하요",
+    "favorite": false
+  },
+  {
+    "name": "최도현",
+    "phoneNumber": "010-7778-8889",
+    "email": "dohyun.choi@example.com",
+    "company": "CJ대한통운",
+    "position": "운송 기사",
+    "nickname": "도도",
+    "favorite": true
+  },
+  {
+    "name": "하예진",
+    "phoneNumber": "010-9992-1003",
+    "email": "yejin.ha@example.com",
+    "company": "이마트",
+    "position": "매장관리자",
+    "nickname": "예진이",
+    "favorite": false
+  },
+  {
+    "name": "송우진",
+    "phoneNumber": "010-1213-1415",
+    "email": "woojin.song@example.com",
+    "company": "GS리테일",
+    "position": "브랜드 기획자",
+    "nickname": "우진이",
+    "favorite": true
+  },
+  {
+    "name": "전지후",
+    "phoneNumber": "010-5051-6061",
+    "email": "jihoo.jeon@example.com",
+    "company": "현대모비스",
+    "position": "부품 개발자",
+    "nickname": "지후",
+    "favorite": false
+  },
+  {
+    "name": "권병수",
+    "phoneNumber": "010-0101-0101",
+    "email": "byeongsu.kwon@example.com",
+    "company": "오픈AI",
+    "position": "AI 연구원",
+    "nickname": "병수",
+    "favorite": true
+  }
+]
