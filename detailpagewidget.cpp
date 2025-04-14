@@ -47,9 +47,20 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setPosition(positionEdit->text());
     m_entry.setNickname(nicknameEdit->text());
 
-    emit entryUpdated(m_entry); // 변경된 데이터를 알림
+    m_saved = true;
+    emit entryUpdated(m_entry);
+    emit detailPageClosed(); // ✅ 메인 페이지에 알려주기
+    this->close();
 }
 
 AddressEntry DetailPageWidget::updatedEntry() const {
     return m_entry;
+}
+
+void DetailPageWidget::closeEvent(QCloseEvent* event) {
+    if (!m_saved) {
+        emit closedWithoutSaving(); // 저장 안 한 경우
+        emit detailPageClosed();    // ✅ 그래도 무조건 닫혔다고 알려줌
+    }
+    QWidget::closeEvent(event);
 }

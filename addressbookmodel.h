@@ -25,6 +25,9 @@ public:
     AddressEntry getEntry(int row) const;
     void updateEntry(int row, const AddressEntry& entry);
 
+    //
+    void setEntries(const QVector<AddressEntry>& entries);
+
 private:
     QVector<AddressEntry> m_entries;
     bool m_favorite = false;

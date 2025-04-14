@@ -6,8 +6,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QVector>
+#include <QDebug>
 #include "AddressEntry.h"
 
+/// JSON 파일에서 주소록 불러오기
 inline QVector<AddressEntry> loadAddressBookFromJson(const QString& filePath) {
     QVector<AddressEntry> entries;
 
@@ -43,5 +45,31 @@ inline QVector<AddressEntry> loadAddressBookFromJson(const QString& filePath) {
     return entries;
 }
 
+/// 주소록을 JSON 파일로 저장
+inline bool saveAddressBookToJson(const QVector<AddressEntry>& entries, const QString& filePath) {
+    QJsonArray array;
+    for (const AddressEntry& entry : entries) {
+        QJsonObject obj;
+        obj["name"] = entry.name();
+        obj["phoneNumber"] = entry.phoneNumber();
+        obj["email"] = entry.email();
+        obj["company"] = entry.company();
+        obj["position"] = entry.position();
+        obj["nickname"] = entry.nickname();
+        obj["favorite"] = entry.favorite();
+        array.append(obj);
+    }
+
+    QJsonDocument doc(array);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        qWarning("JSON 파일 쓰기 실패: %s", qUtf8Printable(file.errorString()));
+        return false;
+    }
+
+    file.write(doc.toJson(QJsonDocument::Indented));
+    file.close();
+    return true;
+}
 
 #endif // UTIL_H

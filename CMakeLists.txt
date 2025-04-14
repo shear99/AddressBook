@@ -23,8 +23,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(AddressBook
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        mainpagWeidget.cpp
-        mainpagWeidget.h
+
+
         addressbookmodel.cpp
         addressbookmodel.h
         addressbookmodel.cpp
@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         addressentry.h
         testAddressBookData.json
         util.h
+        mainpagewidget.h mainpagewidget.cpp mainpagewidget.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET AddressBook APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

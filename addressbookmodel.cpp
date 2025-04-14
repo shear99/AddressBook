@@ -1,3 +1,6 @@
+#include <QCoreApplication>
+#include <QDir>
+
 #include "AddressBookModel.h"
 #include "util.h"
 
@@ -5,7 +8,8 @@
 AddressBookModel::AddressBookModel(QObject* parent)
     : QAbstractTableModel(parent)
 {
-    m_entries = loadAddressBookFromJson("testAddressBookData.json");
+    QString path = "C:/Users/1-22/Documents/QT/AddressBook/testAddressBookData.json";
+    m_entries = loadAddressBookFromJson(path);
 }
 
 int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
@@ -105,4 +109,10 @@ void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
 
     m_entries[row] = entry;
     emit dataChanged(index(row, 0), index(row, columnCount() - 1));
+}
+
+void AddressBookModel::setEntries(const QVector<AddressEntry>& entries) {
+    beginResetModel();
+    m_entries = entries;
+    endResetModel();
 }
