@@ -121,12 +121,17 @@ Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const {
 void AddressBookModel::removeEntry(int row) {
     if (row < 0 || row >= m_entries.size())
         return;
+
+    // 삭제할 항목의 복사본을 보관 (AWS 삭제 요청을 위해)
+    AddressEntry removedEntry = m_entries.at(row);
+
     beginRemoveRows(QModelIndex(), row, row);
     m_entries.removeAt(row);
     endRemoveRows();
 
-    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
-        qWarning("Failed to save data to AWS.");
+    // AWS에서 해당 항목 삭제 요청
+    if (!deleteAddressEntryFromAWS(removedEntry, getAwsSaveUrl())) {
+        qWarning("Failed to delete entry from AWS.");
     }
 }
 

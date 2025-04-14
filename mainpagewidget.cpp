@@ -1,8 +1,8 @@
 #include "mainpagewidget.h"
 #include "ui_mainpagewidget.h"
-#include "AddressBookModel.h"
+#include "addressbookmodel.h".h"
 #include "detailpagewidget.h"
-#include "HeartDelegate.h"
+#include "heartdelegate.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -57,7 +57,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         // 빈 AddressEntry 생성. 필수 필드(이름, 전화번호)는 DetailPageWidget에서 검증
         AddressEntry newEntry;
         DetailPageWidget* detailPage = new DetailPageWidget(newEntry);
-        this->hide();
+        //this->hide();
         detailPage->show();
 
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {

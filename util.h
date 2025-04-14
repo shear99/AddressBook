@@ -24,6 +24,37 @@ inline QUrl getAwsSaveUrl() {
     return QUrl(QString::fromUtf8(qgetenv("AWS_LAMBDA_SAVE_URL")));
 }
 
+// lamdba에 delete키를 추가하여 DB에 삭제 요청
+inline bool deleteAddressEntryFromAWS(const AddressEntry& entry, const QUrl& url) {
+    QJsonObject deleteObj;
+    deleteObj["phoneNumber"] = entry.phoneNumber();
+    deleteObj["name"] = entry.name();
+
+    QJsonObject root;
+    // "delete" 키를 통해 삭제 요청임을 표시합니다.
+    root["delete"] = deleteObj;
+    QJsonDocument doc(root);
+    QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
+
+    QNetworkAccessManager manager;
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply* reply = manager.post(request, jsonData);
+
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning() << "Failed to delete entry on AWS:" << reply->errorString();
+        reply->deleteLater();
+        return false;
+    }
+    reply->deleteLater();
+    return true;
+}
+
 /// AWS Lambda를 통해 주소록 데이터를 불러오기
 inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
     QList<AddressEntry> entries;
