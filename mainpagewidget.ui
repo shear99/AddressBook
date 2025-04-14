@@ -19,8 +19,21 @@
      <x>20</x>
      <y>20</y>
      <width>750</width>
-     <height>550</height>
+     <height>500</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addButton">
+   <property name="geometry">
+    <rect>
+     <x>674</x>
+     <y>543</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
    </property>
   </widget>
  </widget>

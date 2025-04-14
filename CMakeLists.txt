@@ -37,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         .env
         envloader.h
         resources.qrc
+        heartdelegate.h heartdelegate.cpp
     )
 else()
     if(ANDROID)
