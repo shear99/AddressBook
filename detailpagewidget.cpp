@@ -1,4 +1,6 @@
 #include "detailpagewidget.h"
+#include <QMessageBox>
+#include <QCloseEvent>
 
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
     : QWidget(parent), m_entry(entry)
@@ -19,8 +21,8 @@ void DetailPageWidget::setupUI() {
     connect(saveButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
 
     QFormLayout* layout = new QFormLayout(this);
-    layout->addRow("Name", nameEdit);
-    layout->addRow("Phone", phoneEdit);
+    layout->addRow("Name*", nameEdit);
+    layout->addRow("Phone*", phoneEdit);
     layout->addRow("Email", emailEdit);
     layout->addRow("Company", companyEdit);
     layout->addRow("Position", positionEdit);
@@ -40,6 +42,12 @@ void DetailPageWidget::populateFields() {
 }
 
 void DetailPageWidget::onSaveClicked() {
+    // 필수 필드 확인: 이름과 전화번호
+    if (nameEdit->text().trimmed().isEmpty() || phoneEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, tr("입력 오류"), tr("이름과 전화번호는 반드시 입력되어야 합니다."));
+        return;
+    }
+
     m_entry.setName(nameEdit->text());
     m_entry.setPhoneNumber(phoneEdit->text());
     m_entry.setEmail(emailEdit->text());
@@ -49,7 +57,7 @@ void DetailPageWidget::onSaveClicked() {
 
     m_saved = true;
     emit entryUpdated(m_entry);
-    emit detailPageClosed(); // ✅ 메인 페이지에 알려주기
+    emit detailPageClosed();
     this->close();
 }
 
@@ -59,8 +67,8 @@ AddressEntry DetailPageWidget::updatedEntry() const {
 
 void DetailPageWidget::closeEvent(QCloseEvent* event) {
     if (!m_saved) {
-        emit closedWithoutSaving(); // 저장 안 한 경우
-        emit detailPageClosed();    // ✅ 그래도 무조건 닫혔다고 알려줌
+        emit closedWithoutSaving();
+        emit detailPageClosed();
     }
     QWidget::closeEvent(event);
 }

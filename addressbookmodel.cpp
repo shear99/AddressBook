@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QIcon>
-#include "AddressBookModel.h"
+#include "addressbookmodel.h"
 #include "util.h"
 
 AddressBookModel::AddressBookModel(QObject* parent)
@@ -153,6 +153,17 @@ void AddressBookModel::setEntries(const QList<AddressEntry>& entries) {
     m_entries = entries;
     endResetModel();
 
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
+    }
+}
+
+void AddressBookModel::addEntry(const AddressEntry& entry) {
+    beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
+    m_entries.append(entry);
+    endInsertRows();
+
+    // AWS에 저장
     if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
         qWarning("Failed to save data to AWS.");
     }

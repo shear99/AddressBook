@@ -1,4 +1,3 @@
-// DetailPageWidget.h
 #ifndef DETAILPAGEWIDGET_H
 #define DETAILPAGEWIDGET_H
 
@@ -6,7 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFormLayout>
-#include "AddressEntry.h"
+#include "addressentry.h"
 
 class DetailPageWidget : public QWidget {
     Q_OBJECT
@@ -29,7 +28,6 @@ private slots:
 private:
     AddressEntry m_entry;
 
-
     QLineEdit* nameEdit;
     QLineEdit* phoneEdit;
     QLineEdit* emailEdit;
@@ -41,6 +39,7 @@ private:
 
     void setupUI();
     void populateFields();
+
     bool m_saved = false;
 };
 
