@@ -5,6 +5,8 @@
 #include <QList>
 #include <QString>
 #include <QUrl>
+#include <QPixmap>
+
 #include "AddressEntry.h"
 
 class AddressBookModel : public QAbstractTableModel {
@@ -32,6 +34,8 @@ private:
     QList<AddressEntry> m_entries;
     QUrl m_loadUrl;
     QUrl m_saveUrl;
+    QPixmap m_favTrue;
+    QPixmap m_favFalse;
 };
 
 #endif // ADDRESSBOOKMODEL_H

@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         .env
         envloader.h
+        resources.qrc
     )
 else()
     if(ANDROID)

@@ -8,8 +8,12 @@ MainPageWidget::MainPageWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // 모델 생성 및 설정
     model = new AddressBookModel(this);
     ui->addressTableView->setModel(model);
+
+    // ⭐ 단일 클릭으로 편집(하트 클릭) 가능하게
+    ui->addressTableView->setEditTriggers(QAbstractItemView::SelectedClicked);
 
     // 테이블 옵션 설정
     ui->addressTableView->horizontalHeader()->setStretchLastSection(true);
