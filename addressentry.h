@@ -12,13 +12,17 @@ public:
                  const QString& email,
                  const QString& company,
                  const QString& position,
-                 const QString& nickname)
+                 const QString& nickname,
+                 bool favorite = false)
         : m_name(name),
         m_phoneNumber(phoneNumber),
         m_email(email),
         m_company(company),
         m_position(position),
-        m_nickname(nickname)
+        m_nickname(nickname),
+        m_favorite(favorite),
+        m_originalName(name),
+        m_originalPhoneNumber(phoneNumber)
     {}
 
     // Getters
@@ -29,6 +33,8 @@ public:
     QString position() const { return m_position; }
     QString nickname() const { return m_nickname; }
     bool favorite() const { return m_favorite; }
+    QString originalName() const { return m_originalName; }
+    QString originalPhoneNumber() const { return m_originalPhoneNumber; }
 
     // Setters
     void setName(const QString& name) { m_name = name; }
@@ -39,6 +45,10 @@ public:
     void setNickname(const QString& nickname) { m_nickname = nickname; }
     void setFavorite(bool favorite) { m_favorite = favorite; }
 
+    // 원본 키 값은 보통 처음 로드할 때 설정되므로, 변경하지 않도록 함
+    void setOriginalName(const QString& name) { m_originalName = name; }
+    void setOriginalPhoneNumber(const QString& phoneNumber) { m_originalPhoneNumber = phoneNumber; }
+
 private:
     QString m_name;
     QString m_phoneNumber;
@@ -47,6 +57,9 @@ private:
     QString m_position;
     QString m_nickname;
     bool m_favorite = false;
+    // 원본 키 값 (초기 로드 시 저장)
+    QString m_originalName;
+    QString m_originalPhoneNumber;
 
 };
 

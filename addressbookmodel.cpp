@@ -16,7 +16,7 @@ int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
 }
 
 int AddressBookModel::columnCount(const QModelIndex& /*parent*/) const {
-    // (0)favorite 아이콘 + (1)name, (2)phone, (3)email, (4)company, (5)position, (6)nickname
+    // (0) favorite 아이콘 + (1) name, (2) phone, (3) email, (4) company, (5) position, (6) nickname
     return 7;
 }
 
@@ -31,7 +31,7 @@ QVariant AddressBookModel::data(const QModelIndex &index, int role) const {
         if (role == Qt::CheckStateRole) {
             return entry.favorite() ? Qt::Checked : Qt::Unchecked;
         }
-        // DisplayRole에는 빈 문자열 반환 (delegate가 그림)
+        // DisplayRole에는 빈 문자열 반환 (커스텀 delegate가 그림)
         else if (role == Qt::DisplayRole) {
             return QString("");
         }
@@ -66,6 +66,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
         case 4: return "Company";
         case 5: return "Position";
         case 6: return "Nickname";
+        default: return QVariant();
         }
     } else {
         return section + 1;
@@ -73,7 +74,7 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
     return QVariant();
 }
 
-// ---------- 여기서 favorite 토글 ----------
+// ---------- 체크박스(즐겨찾기) 토글 ----------
 bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (!index.isValid())
         return false;
@@ -87,7 +88,7 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
         return true;
     }
 
-    // 나머지 열의 수정 처리...
+    // 나머지 열의 수정 처리
     if (role != Qt::EditRole)
         return false;
     switch (index.column()) {
@@ -104,7 +105,7 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
     return true;
 }
 
-// ---------- 열 0도 편집 가능하도록 flags 수정 ----------
+// ---------- 첫 번째 열(즐겨찾기) 편집 가능하도록 flags 수정 ----------
 Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -117,12 +118,11 @@ Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-
 void AddressBookModel::removeEntry(int row) {
     if (row < 0 || row >= m_entries.size())
         return;
 
-    // 삭제할 항목의 복사본을 보관 (AWS 삭제 요청을 위해)
+    // 삭제할 항목 복사본 보관 (AWS 삭제 요청을 위해)
     AddressEntry removedEntry = m_entries.at(row);
 
     beginRemoveRows(QModelIndex(), row, row);
@@ -145,6 +145,7 @@ void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
     if (row < 0 || row >= m_entries.size())
         return;
 
+    // DetailPageWidget에서 이미 원본 키가 올바르게 세팅되어 있다.
     m_entries[row] = entry;
     emit dataChanged(index(row, 0), index(row, columnCount() - 1));
 
@@ -164,12 +165,13 @@ void AddressBookModel::setEntries(const QList<AddressEntry>& entries) {
 }
 
 void AddressBookModel::addEntry(const AddressEntry& entry) {
+    AddressEntry copy = entry;
+    if (copy.originalName().isEmpty()) copy.setOriginalName(copy.name());
+    if (copy.originalPhoneNumber().isEmpty()) copy.setOriginalPhoneNumber(copy.phoneNumber());
+
     beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
-    m_entries.append(entry);
+    m_entries.append(copy);
     endInsertRows();
 
-    // AWS에 저장
-    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
-        qWarning("Failed to save data to AWS.");
-    }
+    saveAddressBookToAWS(m_entries, getAwsSaveUrl());
 }

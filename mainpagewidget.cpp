@@ -14,7 +14,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     ui->setupUi(this);
 
     // 모델 생성 및 테이블뷰에 연결
-    AddressBookModel* model = new AddressBookModel(this);
+    model = new AddressBookModel(this);
     ui->addressTableView->setModel(model);
 
     // 첫 번째 열(즐겨찾기)에는 커스텀 하트 delegate 적용
