@@ -62,10 +62,10 @@ font: 12pt;</string>
      <x>10</x>
      <y>420</y>
      <width>291</width>
-     <height>71</height>
+     <height>72</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="IconLayout">
     <item>
      <widget class="QLabel" name="detailpageCall">
       <property name="styleSheet">
@@ -200,63 +200,6 @@ background-color: rgb(240, 240, 240);</string>
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="detailpageName">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>70</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 240, 240);
-color: rgb(0, 0, 0);
-font: 12pt;
-border: 0px;</string>
-   </property>
-   <property name="text">
-    <string>김진권</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="detailpagePosition">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>120</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 240, 240);
-font: 8pt;
-color: rgb(180, 180, 180);
-border: 0px;</string>
-   </property>
-   <property name="text">
-    <string>사원 / 과장</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="detailpagePhone">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>150</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 240, 240);
-font: 9pt;
-color: rgb(0, 0, 0);
-border: 0px;</string>
-   </property>
-   <property name="text">
-    <string>010-1234-5678</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="detailpageNotice">
    <property name="geometry">
     <rect>
@@ -274,26 +217,7 @@ border: 0px;
 padding-left: 10px;</string>
    </property>
    <property name="text">
-    <string>휴가로 ~10/31까지 부재입니다.</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="detailpageNickname">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>95</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 240, 240);
-font: 8pt;
-color: rgb(180, 180, 180);
-border: 0px;</string>
-   </property>
-   <property name="text">
-    <string>(진권이)</string>
+    <string>메모</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="detailpageCompany">
@@ -438,7 +362,7 @@ padding-left: 10px;</string>
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="detailpageNoticeText_2">
+  <widget class="QLabel" name="detailpageLabel">
    <property name="geometry">
     <rect>
      <x>230</x>
@@ -459,18 +383,116 @@ padding-left: 2px;</string>
     <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
    </property>
   </widget>
-  <zorder>detailpageNoticeText_2</zorder>
+  <widget class="QPushButton" name="detailpageaddnewButton">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>410</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">image: url(:/detailpageImage/detailpageImage/person_add_30dp_000000.png);
+background-color: rgb(240, 240, 240);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="detailpageaddnewLabel">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>430</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(126, 126, 126);
+font: 8pt;
+padding-left: 2px;</string>
+   </property>
+   <property name="text">
+    <string>Add New</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>70</y>
+     <width>121</width>
+     <height>95</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="infoLayout">
+    <item>
+     <widget class="QLineEdit" name="detailpageName">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(240, 240, 240);
+color: rgb(0, 0, 0);
+font: 12pt;
+border: 0px;</string>
+      </property>
+      <property name="text">
+       <string>김진권</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="detailpageNickname">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(240, 240, 240);
+font: 8pt;
+color: rgb(180, 180, 180);
+border: 0px;</string>
+      </property>
+      <property name="text">
+       <string>(진권이)</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="detailpagePosition">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(240, 240, 240);
+font: 8pt;
+color: rgb(180, 180, 180);
+border: 0px;</string>
+      </property>
+      <property name="text">
+       <string>사원 / 과장</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="detailpagePhone">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(240, 240, 240);
+font: 9pt;
+color: rgb(0, 0, 0);
+border: 0px;</string>
+      </property>
+      <property name="text">
+       <string>010-1234-5678</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <zorder>detailpageLabel</zorder>
   <zorder>detailpageiconOutline</zorder>
-  <zorder>detailpageNickname</zorder>
   <zorder>detailpageImage</zorder>
   <zorder>detailpageTitle</zorder>
   <zorder>horizontalLayoutWidget</zorder>
   <zorder>detailpageNoticeText</zorder>
   <zorder>detailpagesaveButton</zorder>
   <zorder>detailpageeditButton</zorder>
-  <zorder>detailpageName</zorder>
-  <zorder>detailpagePosition</zorder>
-  <zorder>detailpagePhone</zorder>
   <zorder>detailpageNotice</zorder>
   <zorder>detailpageexitButton</zorder>
   <zorder>label</zorder>
@@ -478,6 +500,9 @@ padding-left: 2px;</string>
   <zorder>detailpageNoticecompanyText</zorder>
   <zorder>detailpageMail</zorder>
   <zorder>detailpageMailtext</zorder>
+  <zorder>detailpageaddnewButton</zorder>
+  <zorder>detailpageaddnewLabel</zorder>
+  <zorder>verticalLayoutWidget</zorder>
  </widget>
  <resources/>
  <connections/>

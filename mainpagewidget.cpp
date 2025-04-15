@@ -54,13 +54,12 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     });
 
     // addButton 클릭 시 빈 DetailPageWidget을 열어서 새 항목 추가
+    // MainPageWidget.cpp
     connect(ui->addButton, &QPushButton::clicked, this, [=]() {
-        // 빈 AddressEntry 생성. 필수 필드(이름, 전화번호)는 DetailPageWidget에서 검증
         AddressEntry newEntry;
-        DetailPageWidget* detailPage = new DetailPageWidget(newEntry);
-        //this->hide();
+        //추가 모드로 열기
+        DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true);
         detailPage->show();
-
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {
             model->addEntry(updatedEntry);
         });
@@ -68,6 +67,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
             this->show();
         });
     });
+
 
     // deleteButton 클릭 시, 현재 선택된 항목 삭제 (삭제 확인 다이얼로그 포함)
     connect(ui->deleteButton, &QPushButton::clicked, this, [=]() {

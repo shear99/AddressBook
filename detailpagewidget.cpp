@@ -1,18 +1,18 @@
-#include "detailpagewidget.h"
 #include <QMessageBox>
 #include <QCloseEvent>
 #include "util.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
+#include "detailpagewidget.h"
 
-DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
-    : QWidget(parent), m_entry(entry),ui(new Ui::DetailPageWidget)
+DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode)
+    : QWidget(parent), m_entry(entry),ui(new Ui::DetailPageWidget),m_isAddMode(isAddMode)
 {
     ui->setupUi(this);
+
     setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
-    editInitialSettings();
 
     // setupUI();
     populateFields();
@@ -32,31 +32,48 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
     origPositionStyle = ui->detailpagePosition->styleSheet();
     origNicknameStyle = ui->detailpageNickname->styleSheet();
 
+    modeSetting(m_isAddMode);
+
 }
 
-// void DetailPageWidget::setupUI() {
-//     nameEdit = new QLineEdit(this);
-//     phoneEdit = new QLineEdit(this);
-//     emailEdit = new QLineEdit(this);
-//     companyEdit = new QLineEdit(this);
-//     positionEdit = new QLineEdit(this);
-//     nicknameEdit = new QLineEdit(this);
+void DetailPageWidget::modeSetting(bool _AddMode)
+{
+    //추가 모드
+    if (_AddMode) {
+        // 전화, , 약속초대 버튼 숨기기
+        ui->detailpageCall->hide();
+        ui->detailpagemailImage->hide();
+        ui->detailpageMessage->hide();
+        ui->detailpageInvite->hide();
+        ui->detailpageLabel->hide();
+        ui->detailpageeditButton->hide();
+        ui->detailpagesaveButton->hide();
+        ui->detailpageiconOutline->hide();
+        //
 
-//     saveButton = new QPushButton("Save", this);
-//     connect(ui->detailpageSave, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
+        QString editStyle = "QLineEdit { background: white; }";
+        ui->detailpageName->setStyleSheet(editStyle);
+        ui->detailpagePhone->setStyleSheet(editStyle);
+        ui->detailpageMail->setStyleSheet(editStyle);
+        ui->detailpageNickname->setStyleSheet(editStyle);
 
-//     QFormLayout* layout = new QFormLayout(this);
-//     layout->addRow("Name*", nameEdit);
-//     layout->addRow("Phone*", phoneEdit);
-//     layout->addRow("Email", emailEdit);
-//     layout->addRow("Company", companyEdit);
-//     layout->addRow("Position", positionEdit);
-//     layout->addRow("Nickname", nicknameEdit);
-//     layout->addWidget(saveButton);
-
-//     setLayout(layout);
-// }
-
+        ui->infoLayout->setContentsMargins(20, 10, 10, 10); // 왼쪽 마진
+        // ui->infoLayout->add("이름", ui->detailpageName);
+        // ui->infoLayout->addRow("전화번호", ui->detailpagePhone);
+        // ui->infoLayout->addRow("메일", ui->detailpageMail);
+        // ui->infoLayout->addRow("별명", ui->detailpageNickname);
+        ui->detailpageCompany->setStyleSheet(editStyle);
+        ui->detailpagePosition->setStyleSheet(editStyle);
+        connect(ui->detailpageaddnewButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
+    }
+    //일반 모드
+    else
+    {
+        editInitialSettings();
+        ui->detailpageaddnewButton->hide();
+        ui->detailpageaddnewLabel->hide();
+    }
+}
 void DetailPageWidget::populateFields() {
     ui->detailpageName->setText(m_entry.name());
     ui->detailpagePhone->setText(m_entry.phoneNumber());
@@ -121,16 +138,14 @@ void DetailPageWidget::onSaveClicked() {
     emit detailPageClosed();
     this->close();
 }
-
 void DetailPageWidget::editInitialSettings()
 {
-    //초기 상태 설정
-    ui->detailpageName->setReadOnly(true);
-    ui->detailpagePhone->setReadOnly(true);
-    ui->detailpageMail->setReadOnly(true);
-    ui->detailpageCompany->setReadOnly(true);
-    ui->detailpagePosition->setReadOnly(true);
-    ui->detailpageNickname->setReadOnly(true);
+        ui->detailpageName->setReadOnly(true);
+        ui->detailpagePhone->setReadOnly(true);
+        ui->detailpageMail->setReadOnly(true);
+        ui->detailpageCompany->setReadOnly(true);
+        ui->detailpagePosition->setReadOnly(true);
+        ui->detailpageNickname->setReadOnly(true);
 };
 
 void DetailPageWidget::onEditButtonClicked()

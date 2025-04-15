@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFormLayout>
+#include <QFileDialog>
 #include "addressentry.h"
 #include "fontupdate.h"
 #include "ui_detailpagewidget.h"
@@ -17,10 +18,11 @@ class DetailPageWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent = nullptr);
+    explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent = nullptr,bool isAddMode = false);
     AddressEntry updatedEntry() const; // 수정된 데이터를 외부에서 가져올 수 있도록
     void setOriginalName(const QString& name);
     void setOriginalPhoneNumber(const QString& phoneNumber);
+    void modeSetting(bool _AddMode);
 
 signals:
     void entryUpdated(const AddressEntry& updatedEntry); // 저장 클릭 시 signal로 알림
@@ -35,15 +37,11 @@ private slots:
     void closeWindow();
     void onEditButtonClicked();
 
+
 private:
+    bool m_isAddMode = false;
     QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle;
     AddressEntry m_entry;
-    QLineEdit* nameEdit;
-    QLineEdit* phoneEdit;
-    QLineEdit* emailEdit;
-    QLineEdit* companyEdit;
-    QLineEdit* positionEdit;
-    QLineEdit* nicknameEdit;
 
     QPushButton* saveButton;
 

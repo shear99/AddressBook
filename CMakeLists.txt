@@ -42,6 +42,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         detailpagewidget.ui
         fontupdate.h
         fontupdate.cpp
+        ImageEntry.h
+
+
+
+
+
     )
 else()
     if(ANDROID)
