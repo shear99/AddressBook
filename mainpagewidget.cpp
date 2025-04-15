@@ -36,9 +36,8 @@ MainPageWidget::MainPageWidget(QWidget *parent)
 
     // 더블클릭 시 상세 편집 페이지로 이동 (기존 기능)
     connect(ui->addressTableView, &QTableView::doubleClicked, this, [=](const QModelIndex &index) {
-        if (!index.isValid())
+        if (!index.isValid()|| index.column() == 0)
             return;
-
         int row = index.row();
         AddressEntry entry = model->getEntry(row);
         DetailPageWidget* detailPage = new DetailPageWidget(entry);
@@ -59,6 +58,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         AddressEntry newEntry;
         //추가 모드로 열기
         DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true);
+        this->hide();
         detailPage->show();
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {
             model->addEntry(updatedEntry);

@@ -62,7 +62,7 @@ font: 12pt;</string>
      <x>10</x>
      <y>420</y>
      <width>291</width>
-     <height>72</height>
+     <height>84</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="IconLayout">
