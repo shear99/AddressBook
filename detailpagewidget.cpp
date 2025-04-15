@@ -31,6 +31,7 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     origCompanyStyle = ui->detailpageCompany->styleSheet();
     origPositionStyle = ui->detailpagePosition->styleSheet();
     origNicknameStyle = ui->detailpageNickname->styleSheet();
+    origMemoStyle = ui->detailpageNotice->styleSheet();
 
     modeSetting(m_isAddMode);
 
@@ -81,6 +82,7 @@ void DetailPageWidget::populateFields() {
     ui->detailpageCompany->setText(m_entry.company());
     ui->detailpagePosition->setText(m_entry.position());
     ui->detailpageNickname->setText(m_entry.nickname());
+    ui->detailpageNoticeText->setText(m_entry.memo());
 }
 
 void DetailPageWidget::onSaveClicked() {
@@ -125,6 +127,7 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setCompany(ui->detailpageCompany->text());
     m_entry.setPosition(ui->detailpagePosition->text());
     m_entry.setNickname(ui->detailpageNickname->text());
+    m_entry.setMemo(ui->detailpageNotice->text());
 
     if (isModified) {
         setOriginalName(newName);
@@ -145,6 +148,7 @@ void DetailPageWidget::editInitialSettings()
         ui->detailpageMail->setReadOnly(true);
         ui->detailpageCompany->setReadOnly(true);
         ui->detailpagePosition->setReadOnly(true);
+        ui->detailpageNickname->setReadOnly(true);
         ui->detailpageNickname->setReadOnly(true);
 };
 

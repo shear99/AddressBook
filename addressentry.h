@@ -1,28 +1,26 @@
 #ifndef ADDRESSENTRY_H
 #define ADDRESSENTRY_H
-
 #include <QString>
-
 class AddressEntry {
 public:
     AddressEntry() = default;
-
     AddressEntry(const QString& name,
                  const QString& phoneNumber,
                  const QString& email,
                  const QString& company,
                  const QString& position,
                  const QString& nickname,
-                 bool favorite = false)
+                 bool favorite = false,
+                 const QString& memo = QString())
         : m_name(name),
         m_phoneNumber(phoneNumber),
         m_email(email),
         m_company(company),
         m_position(position),
         m_nickname(nickname),
-        m_favorite(favorite)
+        m_favorite(favorite),
+        m_memo(memo)
     {}
-
     // Getters
     QString name() const { return m_name; }
     QString phoneNumber() const { return m_phoneNumber; }
@@ -31,7 +29,7 @@ public:
     QString position() const { return m_position; }
     QString nickname() const { return m_nickname; }
     bool favorite() const { return m_favorite; }
-
+    QString memo() const { return m_memo; }
     // Setters
     void setName(const QString& name) { m_name = name; }
     void setPhoneNumber(const QString& phoneNumber) { m_phoneNumber = phoneNumber; }
@@ -40,7 +38,7 @@ public:
     void setPosition(const QString& position) { m_position = position; }
     void setNickname(const QString& nickname) { m_nickname = nickname; }
     void setFavorite(bool favorite) { m_favorite = favorite; }
-
+    void setMemo(const QString & memo) { m_memo = memo; }
 private:
     QString m_name;
     QString m_phoneNumber;
@@ -49,7 +47,6 @@ private:
     QString m_position;
     QString m_nickname;
     bool m_favorite = false;
-
+    QString m_memo;
 };
-
 #endif // ADDRESSENTRY_H

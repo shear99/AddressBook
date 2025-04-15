@@ -40,7 +40,7 @@ private slots:
 
 private:
     bool m_isAddMode = false;
-    QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle;
+    QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle, origMemoStyle;
     AddressEntry m_entry;
 
     QPushButton* saveButton;
