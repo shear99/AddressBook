@@ -11,6 +11,9 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
 {
     ui->setupUi(this);
 
+    // 최대화/최소화 버튼 제거
+    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
+
     setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
 
@@ -41,7 +44,8 @@ void DetailPageWidget::modeSetting(bool _AddMode)
 {
     //추가 모드
     if (_AddMode) {
-        // 전화, , 약속초대 버튼 숨기기
+        ui->detailpageTitle->setText("연락처 추가");
+        //편집모드 버튼 숨기기
         ui->detailpageCall->hide();
         ui->detailpagemailImage->hide();
         ui->detailpageMessage->hide();
@@ -50,19 +54,29 @@ void DetailPageWidget::modeSetting(bool _AddMode)
         ui->detailpageeditButton->hide();
         ui->detailpagesaveButton->hide();
         ui->detailpageiconOutline->hide();
-        //
 
         QString editStyle = "QLineEdit { background: white; }";
         ui->detailpageName->setStyleSheet(editStyle);
         ui->detailpagePhone->setStyleSheet(editStyle);
         ui->detailpageMail->setStyleSheet(editStyle);
         ui->detailpageNickname->setStyleSheet(editStyle);
+        ui->detailpageNotice->setStyleSheet(editStyle);
 
-        ui->infoLayout->setContentsMargins(20, 10, 10, 10); // 왼쪽 마진
-        // ui->infoLayout->add("이름", ui->detailpageName);
-        // ui->infoLayout->addRow("전화번호", ui->detailpagePhone);
-        // ui->infoLayout->addRow("메일", ui->detailpageMail);
-        // ui->infoLayout->addRow("별명", ui->detailpageNickname);
+        ui->infoVLayout->setContentsMargins(5, 0, 0, 0); // 왼쪽 마진
+        // 레이블 생성 및 LineEdit 재배치
+        QLabel* nameLabel = new QLabel("Name:", this);
+        QLabel* phoneLabel = new QLabel("Phone:", this);
+        QLabel* positionLabel = new QLabel("Position:", this);
+        QLabel* nicknameLabel = new QLabel("Nickname:", this);
+
+        // QFormLayout 오른쪽 정렬
+        ui->infoFormLayout->setLabelAlignment(Qt::AlignRight);
+
+        ui->infoFormLayout->addRow(nameLabel, ui->detailpageName);
+        ui->infoFormLayout->addRow(phoneLabel, ui->detailpagePhone);
+        ui->infoFormLayout->addRow(positionLabel, ui->detailpagePosition);
+        ui->infoFormLayout->addRow(nicknameLabel, ui->detailpageNickname);
+
         ui->detailpageCompany->setStyleSheet(editStyle);
         ui->detailpagePosition->setStyleSheet(editStyle);
         connect(ui->detailpageaddnewButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
@@ -82,7 +96,7 @@ void DetailPageWidget::populateFields() {
     ui->detailpageCompany->setText(m_entry.company());
     ui->detailpagePosition->setText(m_entry.position());
     ui->detailpageNickname->setText(m_entry.nickname());
-    ui->detailpageNoticeText->setText(m_entry.memo());
+    ui->detailpageNotice->setText(m_entry.memo());
 }
 
 void DetailPageWidget::onSaveClicked() {
@@ -149,7 +163,7 @@ void DetailPageWidget::editInitialSettings()
         ui->detailpageCompany->setReadOnly(true);
         ui->detailpagePosition->setReadOnly(true);
         ui->detailpageNickname->setReadOnly(true);
-        ui->detailpageNickname->setReadOnly(true);
+        ui->detailpageNotice->setReadOnly(true);
 };
 
 void DetailPageWidget::onEditButtonClicked()
@@ -175,6 +189,9 @@ void DetailPageWidget::onEditButtonClicked()
 
     ui->detailpageNickname->setReadOnly(!isReadOnly);
     ui->detailpageNickname->setStyleSheet(isReadOnly ? editStyle : origNicknameStyle);
+
+    ui->detailpageNotice->setReadOnly(!isReadOnly);
+    ui->detailpageNotice->setStyleSheet(isReadOnly ? editStyle : origMemoStyle);
 }
 
 

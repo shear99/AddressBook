@@ -20,7 +20,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
+     <y>90</y>
      <width>90</width>
      <height>90</height>
     </rect>
@@ -40,7 +40,7 @@ background-color: lightgray;
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>20</y>
      <width>101</width>
      <height>41</height>
     </rect>
@@ -152,7 +152,7 @@ padding-bottom: 10px;</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
+     <y>200</y>
      <width>291</width>
      <height>20</height>
     </rect>
@@ -169,8 +169,8 @@ padding-left: 10px;</string>
   <widget class="QPushButton" name="detailpagesaveButton">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>70</y>
+     <x>280</x>
+     <y>50</y>
      <width>21</width>
      <height>21</height>
     </rect>
@@ -186,8 +186,8 @@ background-color: rgb(240, 240, 240);</string>
   <widget class="QPushButton" name="detailpageeditButton">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>70</y>
+     <x>250</x>
+     <y>50</y>
      <width>21</width>
      <height>21</height>
     </rect>
@@ -204,7 +204,7 @@ background-color: rgb(240, 240, 240);</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>190</y>
+     <y>220</y>
      <width>291</width>
      <height>21</height>
     </rect>
@@ -227,7 +227,7 @@ padding-left: 10px;</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>230</y>
+     <y>270</y>
      <width>291</width>
      <height>41</height>
     </rect>
@@ -247,7 +247,7 @@ padding-left: 10px;</string>
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>20</y>
+     <y>10</y>
      <width>31</width>
      <height>31</height>
     </rect>
@@ -280,8 +280,8 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>220</y>
-     <width>61</width>
+     <y>250</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -292,10 +292,10 @@ font: 8pt;
 padding-left: 0px;</string>
    </property>
    <property name="text">
-    <string>Company</string>
+    <string>- Company</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignCenter</set>
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLineEdit" name="detailpageMail">
@@ -305,7 +305,7 @@ padding-left: 0px;</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>290</y>
+     <y>340</y>
      <width>291</width>
      <height>41</height>
     </rect>
@@ -325,8 +325,8 @@ padding-left: 10px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>280</y>
-     <width>31</width>
+     <y>320</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -337,10 +337,10 @@ font: 8pt;
 padding-left: 0px;</string>
    </property>
    <property name="text">
-    <string>Mail</string>
+    <string>- Mail</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignmentFlag::AlignCenter</set>
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="detailpageiconOutline">
@@ -365,8 +365,8 @@ padding-left: 10px;</string>
   <widget class="QLabel" name="detailpageLabel">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>90</y>
+     <x>240</x>
+     <y>70</y>
      <width>71</width>
      <height>16</height>
     </rect>
@@ -421,67 +421,71 @@ padding-left: 2px;</string>
     <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
+  <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>70</y>
-     <width>121</width>
-     <height>95</height>
+     <x>100</x>
+     <y>90</y>
+     <width>201</width>
+     <height>121</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="infoLayout">
-    <item>
-     <widget class="QLineEdit" name="detailpageName">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(240, 240, 240);
+   <layout class="QFormLayout" name="infoFormLayout">
+    <item row="0" column="1">
+     <layout class="QVBoxLayout" name="infoVLayout">
+      <item>
+       <widget class="QLineEdit" name="detailpageName">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(240, 240, 240);
 color: rgb(0, 0, 0);
 font: 12pt;
 border: 0px;</string>
-      </property>
-      <property name="text">
-       <string>김진권</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="detailpageNickname">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(240, 240, 240);
+        </property>
+        <property name="text">
+         <string>김진권</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="detailpageNickname">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(240, 240, 240);
 font: 8pt;
 color: rgb(180, 180, 180);
 border: 0px;</string>
-      </property>
-      <property name="text">
-       <string>(진권이)</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="detailpagePosition">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(240, 240, 240);
+        </property>
+        <property name="text">
+         <string>(진권이)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="detailpagePosition">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(240, 240, 240);
 font: 8pt;
 color: rgb(180, 180, 180);
 border: 0px;</string>
-      </property>
-      <property name="text">
-       <string>사원 / 과장</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="detailpagePhone">
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(240, 240, 240);
+        </property>
+        <property name="text">
+         <string>사원 / 과장</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="detailpagePhone">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(240, 240, 240);
 font: 9pt;
 color: rgb(0, 0, 0);
 border: 0px;</string>
-      </property>
-      <property name="text">
-       <string>010-1234-5678</string>
-      </property>
-     </widget>
+        </property>
+        <property name="text">
+         <string>010-1234-5678</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -502,7 +506,7 @@ border: 0px;</string>
   <zorder>detailpageMailtext</zorder>
   <zorder>detailpageaddnewButton</zorder>
   <zorder>detailpageaddnewLabel</zorder>
-  <zorder>verticalLayoutWidget</zorder>
+  <zorder>formLayoutWidget</zorder>
  </widget>
  <resources/>
  <connections/>
