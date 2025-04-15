@@ -2,6 +2,9 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include "util.h"
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QMessageBox>
 
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
     : QWidget(parent), m_entry(entry)
@@ -55,23 +58,31 @@ void DetailPageWidget::onSaveClicked() {
         return;
     }
 
+    // 전화번호 양식 검증: 000-0000-0000 형식인지 체크
+    QString phone = phoneEdit->text().trimmed();
+    QRegularExpression regex("^\\d{3}-\\d{4}-\\d{4}$");
+    QRegularExpressionMatch match = regex.match(phone);
+    if (!match.hasMatch()) {
+        QMessageBox::warning(this, tr("입력 오류"), tr("전화번호는 000-0000-0000 형식이어야 합니다."));
+        return;
+    }
+
     // 사용자가 입력한 새 값을 임시로 보관
     QString newName = nameEdit->text();
-    QString newPhone = phoneEdit->text();
+    QString newPhone = phone;
 
-    // 수정 여부 판단: 원본과 새 값이 다른지 확인
+    // 수정 여부 판단: 원본과 새 값 비교
     bool isModified = (m_entry.originalName() != newName) || (m_entry.originalPhoneNumber() != newPhone);
 
-    // 만약 수정된 경우, 기존 원본값을 바탕으로 삭제 요청
+    // 수정된 경우, 기존 튜플을 삭제 요청
     if (isModified) {
-        // 기존 원본 키로 삭제 요청 (deleteAddressEntryFromAWS는 util.h에 정의되어 있음)
         if (!deleteAddressEntryFromAWS(m_entry, getAwsSaveUrl())) {
             QMessageBox::warning(this, tr("삭제 오류"), tr("이전 튜플 삭제에 실패했습니다."));
-            return;  // 삭제 실패하면 저장 진행 중단
+            return;
         }
     }
 
-    // 사용자가 입력한 값으로 현재 entry 업데이트
+    // 사용자가 입력한 값으로 업데이트
     m_entry.setName(newName);
     m_entry.setPhoneNumber(newPhone);
     m_entry.setEmail(emailEdit->text());
@@ -79,8 +90,8 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setPosition(positionEdit->text());
     m_entry.setNickname(nicknameEdit->text());
 
-    // 만약 수정이 일어났다면, 삭제 후 정상적으로 저장이 이뤄지면 원본 키를 새 값으로 갱신
-    if(isModified) {
+    // 수정된 경우, 삭제가 성공하면 원본 키를 새 값으로 갱신
+    if (isModified) {
         m_entry.setOriginalName(newName);
         m_entry.setOriginalPhoneNumber(newPhone);
     }
@@ -90,7 +101,6 @@ void DetailPageWidget::onSaveClicked() {
     emit detailPageClosed();
     this->close();
 }
-
 
 
 AddressEntry DetailPageWidget::updatedEntry() const {

@@ -12,6 +12,7 @@ AddressBookModel::AddressBookModel(QObject* parent)
 }
 
 int AddressBookModel::rowCount(const QModelIndex& /*parent*/) const {
+    // 튜플의 개수
     return m_entries.size();
 }
 
@@ -74,13 +75,13 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
     return QVariant();
 }
 
-// ---------- 체크박스(즐겨찾기) 토글 ----------
 bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (!index.isValid())
         return false;
 
     AddressEntry &entry = m_entries[index.row()];
 
+    // 체크박스(즐겨찾기) 토글
     if (index.column() == 0 && role == Qt::CheckStateRole) {
         entry.setFavorite(value.toInt() == Qt::Checked);
         emit dataChanged(index, index, {Qt::CheckStateRole});
@@ -100,18 +101,21 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
     case 6: entry.setNickname(value.toString()); break;
     default: return false;
     }
+
+    // 데이터 변경 시그널
     emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
     saveAddressBookToAWS(m_entries, getAwsSaveUrl());
+
     return true;
 }
 
-// ---------- 첫 번째 열(즐겨찾기) 편집 가능하도록 flags 수정 ----------
 Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const {
     if (!index.isValid())
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = QAbstractTableModel::flags(index);
 
+    // 첫 번째 열(즐겨찾기) 편집 가능
     if (index.column() == 0)
         flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
