@@ -20,9 +20,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>60</y>
-     <width>81</width>
-     <height>91</height>
+     <y>70</y>
+     <width>90</width>
+     <height>90</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -60,37 +60,19 @@ font: 12pt;</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
+     <y>420</y>
      <width>291</width>
      <height>71</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QLabel" name="detailpageMessage">
-      <property name="styleSheet">
-       <string notr="true">color: rgb(89, 133, 225);
-image: url(:/detailpageImage/detailpageImage/sms_33dp_5985E1.png);
-font: 700 7pt;</string>
-      </property>
-      <property name="text">
-       <string>
-
-
-
-메세지</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QLabel" name="detailpageCall">
       <property name="styleSheet">
        <string notr="true">color: rgb(89, 133, 225);
 image: url(:/detailpageImage/detailpageImage/call_33dp_5985E1.png);
-font: 700 7pt;</string>
+font: 700 7pt;
+padding-bottom: 10px;</string>
       </property>
       <property name="text">
        <string>
@@ -105,11 +87,32 @@ font: 700 7pt;</string>
      </widget>
     </item>
     <item>
+     <widget class="QLabel" name="detailpageMessage">
+      <property name="styleSheet">
+       <string notr="true">color: rgb(89, 133, 225);
+image: url(:/detailpageImage/detailpageImage/sms_33dp_5985E1.png);
+font: 700 7pt;
+padding-bottom: 10px;</string>
+      </property>
+      <property name="text">
+       <string>
+
+
+
+메세지</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QLabel" name="detailpagemailImage">
       <property name="styleSheet">
        <string notr="true">color: rgb(89, 133, 225);
 font: 700 7pt;
-image: url(:/detailpageImage/detailpageImage/mail_33dp_5985E1.png);</string>
+image: url(:/detailpageImage/detailpageImage/mail_33dp_5985E1.png);
+padding-bottom: 10px;</string>
       </property>
       <property name="text">
        <string>
@@ -128,7 +131,8 @@ image: url(:/detailpageImage/detailpageImage/mail_33dp_5985E1.png);</string>
       <property name="styleSheet">
        <string notr="true">color: rgb(89, 133, 225);
 font: 700 7pt;
-image: url(:/detailpageImage/detailpageImage/event_33dp_5985E1.png);</string>
+image: url(:/detailpageImage/detailpageImage/event_33dp_5985E1.png);
+padding-bottom: 10px;</string>
       </property>
       <property name="text">
        <string>
@@ -144,41 +148,25 @@ image: url(:/detailpageImage/detailpageImage/event_33dp_5985E1.png);</string>
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="detailpageMailtext">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>250</y>
-     <width>31</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(126, 126, 126);
-font: 8pt;</string>
-   </property>
-   <property name="text">
-    <string>메일</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="detailpageNoticeText">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>160</y>
-     <width>41</width>
+     <x>10</x>
+     <y>170</y>
+     <width>291</width>
      <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">color: rgb(126, 126, 126);
-font: 8pt;</string>
+font: 8pt;
+padding-left: 10px;</string>
    </property>
    <property name="text">
-    <string>※ 메모</string>
+    <string>※ Notice</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="detailpageSave">
+  <widget class="QPushButton" name="detailpagesaveButton">
    <property name="geometry">
     <rect>
      <x>270</x>
@@ -195,7 +183,7 @@ background-color: rgb(240, 240, 240);</string>
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="detailpageEdit">
+  <widget class="QPushButton" name="detailpageeditButton">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -217,7 +205,7 @@ background-color: rgb(240, 240, 240);</string>
     <rect>
      <x>110</x>
      <y>70</y>
-     <width>91</width>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -235,9 +223,9 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>110</y>
-     <width>101</width>
-     <height>21</height>
+     <y>120</y>
+     <width>121</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -254,8 +242,8 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>130</y>
-     <width>101</width>
+     <y>150</y>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -272,17 +260,18 @@ border: 0px;</string>
   <widget class="QLineEdit" name="detailpageNotice">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>182</y>
-     <width>281</width>
-     <height>31</height>
+     <x>10</x>
+     <y>190</y>
+     <width>291</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(240, 240, 240);
 color: rgb(126, 126, 126);
 font: 8pt;
-border: 0px;</string>
+border: 0px;
+padding-left: 10px;</string>
    </property>
    <property name="text">
     <string>휴가로 ~10/31까지 부재입니다.</string>
@@ -292,9 +281,9 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>90</y>
-     <width>81</width>
-     <height>24</height>
+     <y>95</y>
+     <width>121</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -307,42 +296,27 @@ border: 0px;</string>
     <string>(진권이)</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="detailpageMail">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>270</y>
-     <width>261</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 240, 240);
-font: 9pt;
-color: rgb(0, 0, 0);
-border: 0px;</string>
-   </property>
-   <property name="text">
-    <string>jkkim@hankook.com</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="detailpageCompany">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>210</y>
+     <y>230</y>
      <width>291</width>
-     <height>31</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(240, 240, 240);
-color: rgb(180, 180, 180);
+color: rgb(0,0,0);
 border: 0.5px solid gray;
-border-radius: 10px;</string>
+border-radius: 10px;
+padding-left: 10px;</string>
    </property>
    <property name="text">
-    <string> (주) 한국타이어</string>
+    <string/>
    </property>
   </widget>
   <widget class="QPushButton" name="detailpageexitButton">
@@ -378,22 +352,132 @@ color: rgb(0, 0, 0);</string>
     <string/>
    </property>
   </widget>
-  <zorder>detailpageMail</zorder>
+  <widget class="QLabel" name="detailpageNoticecompanyText">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>220</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(126, 126, 126);
+background-color: rgb(240, 240, 240);
+font: 8pt;
+padding-left: 0px;</string>
+   </property>
+   <property name="text">
+    <string>Company</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="detailpageMail">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>290</y>
+     <width>291</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(240, 240, 240);
+color: rgb(0,0,0);
+border: 0.5px solid gray;
+border-radius: 10px;
+padding-left: 10px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="detailpageMailtext">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(126, 126, 126);
+background-color: rgb(240, 240, 240);
+font: 8pt;
+padding-left: 0px;</string>
+   </property>
+   <property name="text">
+    <string>Mail</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="detailpageiconOutline">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>420</y>
+     <width>291</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(240, 240, 240);
+border: 1px solid rgb(89, 133, 225);
+border-radius: 20px;
+padding-left: 10px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="detailpageNoticeText_2">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>90</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(126, 126, 126);
+font: 7pt;
+padding-left: 2px;</string>
+   </property>
+   <property name="text">
+    <string>Edit    Save</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+  </widget>
+  <zorder>detailpageNoticeText_2</zorder>
+  <zorder>detailpageiconOutline</zorder>
   <zorder>detailpageNickname</zorder>
   <zorder>detailpageImage</zorder>
   <zorder>detailpageTitle</zorder>
   <zorder>horizontalLayoutWidget</zorder>
-  <zorder>detailpageMailtext</zorder>
   <zorder>detailpageNoticeText</zorder>
-  <zorder>detailpageSave</zorder>
-  <zorder>detailpageEdit</zorder>
+  <zorder>detailpagesaveButton</zorder>
+  <zorder>detailpageeditButton</zorder>
   <zorder>detailpageName</zorder>
   <zorder>detailpagePosition</zorder>
   <zorder>detailpagePhone</zorder>
   <zorder>detailpageNotice</zorder>
-  <zorder>detailpageCompany</zorder>
   <zorder>detailpageexitButton</zorder>
   <zorder>label</zorder>
+  <zorder>detailpageCompany</zorder>
+  <zorder>detailpageNoticecompanyText</zorder>
+  <zorder>detailpageMail</zorder>
+  <zorder>detailpageMailtext</zorder>
  </widget>
  <resources/>
  <connections/>

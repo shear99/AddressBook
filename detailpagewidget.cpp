@@ -12,14 +12,26 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
     ui->setupUi(this);
     setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
+    editInitialSettings();
+
     // setupUI();
     populateFields();
-    connect(ui->detailpageSave, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
+    connect(ui->detailpagesaveButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
     connect(ui->detailpageexitButton, &QPushButton::clicked, this, &DetailPageWidget::closeWindow);
+    connect(ui->detailpageeditButton, &QPushButton::clicked, this, &DetailPageWidget::onEditButtonClicked);
 
     // 현재 값을 최초 원본값으로 저장.
     setOriginalName(m_entry.name());
     setOriginalPhoneNumber(m_entry.phoneNumber());
+
+    //초기 스타일 시트 저장
+    origNameStyle = ui->detailpageName->styleSheet();
+    origPhoneStyle = ui->detailpagePhone->styleSheet();
+    origMailStyle = ui->detailpageMail->styleSheet();
+    origCompanyStyle = ui->detailpageCompany->styleSheet();
+    origPositionStyle = ui->detailpagePosition->styleSheet();
+    origNicknameStyle = ui->detailpageNickname->styleSheet();
+
 }
 
 // void DetailPageWidget::setupUI() {
@@ -109,6 +121,46 @@ void DetailPageWidget::onSaveClicked() {
     emit detailPageClosed();
     this->close();
 }
+
+void DetailPageWidget::editInitialSettings()
+{
+    //초기 상태 설정
+    ui->detailpageName->setReadOnly(true);
+    ui->detailpagePhone->setReadOnly(true);
+    ui->detailpageMail->setReadOnly(true);
+    ui->detailpageCompany->setReadOnly(true);
+    ui->detailpagePosition->setReadOnly(true);
+    ui->detailpageNickname->setReadOnly(true);
+};
+
+void DetailPageWidget::onEditButtonClicked()
+{
+    bool isReadOnly = ui->detailpageName->isReadOnly();
+    QString editStyle = "QLineEdit { background: white; }";
+
+    // 편집 모드: 흰색, 읽기 전용: 원래 스타일 복원
+    ui->detailpageName->setReadOnly(!isReadOnly);
+    ui->detailpageName->setStyleSheet(isReadOnly ? editStyle : origNameStyle);
+
+    ui->detailpagePhone->setReadOnly(!isReadOnly);
+    ui->detailpagePhone->setStyleSheet(isReadOnly ? editStyle : origPhoneStyle);
+
+    ui->detailpageMail->setReadOnly(!isReadOnly);
+    ui->detailpageMail->setStyleSheet(isReadOnly ? editStyle : origMailStyle);
+
+    ui->detailpageCompany->setReadOnly(!isReadOnly);
+    ui->detailpageCompany->setStyleSheet(isReadOnly ? editStyle : origCompanyStyle);
+
+    ui->detailpagePosition->setReadOnly(!isReadOnly);
+    ui->detailpagePosition->setStyleSheet(isReadOnly ? editStyle : origPositionStyle);
+
+    ui->detailpageNickname->setReadOnly(!isReadOnly);
+    ui->detailpageNickname->setStyleSheet(isReadOnly ? editStyle : origNicknameStyle);
+}
+
+
+
+
 //창 닫기
 void DetailPageWidget::closeWindow()
 {

@@ -33,8 +33,10 @@ protected:
 private slots:
     void onSaveClicked();
     void closeWindow();
+    void onEditButtonClicked();
 
 private:
+    QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle;
     AddressEntry m_entry;
     QLineEdit* nameEdit;
     QLineEdit* phoneEdit;
@@ -47,7 +49,7 @@ private:
 
     void setupUI();
     void populateFields();
-
+    void editInitialSettings();
     bool m_saved = false;
 
     QString m_originalName;
