@@ -6,6 +6,12 @@
 #include <QPushButton>
 #include <QFormLayout>
 #include "addressentry.h"
+#include "fontupdate.h"
+#include "ui_detailpagewidget.h"
+
+namespace Ui {
+class DetailPageWidget;
+}
 
 class DetailPageWidget : public QWidget {
     Q_OBJECT
@@ -26,10 +32,10 @@ protected:
 
 private slots:
     void onSaveClicked();
+    void closeWindow();
 
 private:
     AddressEntry m_entry;
-
     QLineEdit* nameEdit;
     QLineEdit* phoneEdit;
     QLineEdit* emailEdit;
@@ -46,6 +52,8 @@ private:
 
     QString m_originalName;
     QString m_originalPhoneNumber;
+
+    Ui::DetailPageWidget *ui;
 };
 
 #endif // DETAILPAGEWIDGET_H

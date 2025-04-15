@@ -3,4 +3,23 @@
         <file>asset/no.png</file>
         <file>asset/yes.png</file>
     </qresource>
+    <qresource prefix="/detailpageImage">
+        <file>detailpageImage/calling.png</file>
+        <file>detailpageImage/close_35dp_666666.png</file>
+        <file>detailpageImage/event_33dp_5985E1.png</file>
+        <file>detailpageImage/mail.png</file>
+        <file>detailpageImage/mail_33dp_5985E1.png</file>
+        <file>detailpageImage/meeting.png</file>
+        <file>detailpageImage/message.png</file>
+        <file>detailpageImage/person_100dp_000000.png</file>
+        <file>detailpageImage/sms_33dp_5985E1.png</file>
+        <file>detailpageImage/edit_20dp_999999.png</file>
+        <file>detailpageImage/box_20dp_999999.png</file>
+        <file>detailpageImage/call_33dp_5985E1.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file>fonts/GmarketSansTTFBold.ttf</file>
+        <file>fonts/GmarketSansTTFLight.ttf</file>
+        <file>fonts/GmarketSansTTFMedium.ttf</file>
+    </qresource>
 </RCC>

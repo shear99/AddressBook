@@ -1,8 +1,9 @@
 #include "mainpagewidget.h"
 #include "ui_mainpagewidget.h"
-#include "addressbookmodel.h".h"
+#include "addressbookmodel.h"
 #include "detailpagewidget.h"
 #include "heartdelegate.h"
+#include "fontupdate.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -12,7 +13,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     , ui(new Ui::MainPageWidget)
 {
     ui->setupUi(this);
-
+    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
     // 모델 생성 및 테이블뷰에 연결
     model = new AddressBookModel(this);
     ui->addressTableView->setModel(model);

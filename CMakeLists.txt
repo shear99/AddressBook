@@ -39,6 +39,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resources.qrc
         heartdelegate.h heartdelegate.cpp
         loadingdialog.h
+        detailpagewidget.ui
+        fontupdate.h
+        fontupdate.cpp
     )
 else()
     if(ANDROID)
