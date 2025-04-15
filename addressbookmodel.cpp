@@ -3,6 +3,7 @@
 #include <QIcon>
 #include "addressbookmodel.h"
 #include "util.h"
+#include "loadingdialog.h"
 
 AddressBookModel::AddressBookModel(QObject* parent)
     : QAbstractTableModel(parent)
@@ -126,17 +127,22 @@ void AddressBookModel::removeEntry(int row) {
     if (row < 0 || row >= m_entries.size())
         return;
 
-    // 삭제할 항목 복사본 보관 (AWS 삭제 요청을 위해)
     AddressEntry removedEntry = m_entries.at(row);
 
     beginRemoveRows(QModelIndex(), row, row);
     m_entries.removeAt(row);
     endRemoveRows();
 
-    // AWS에서 해당 항목 삭제 요청
+    // 통신 중 다이얼로그
+    LoadingDialog dialog;
+    dialog.show();
+    QCoreApplication::processEvents();
+
     if (!deleteAddressEntryFromAWS(removedEntry, getAwsSaveUrl())) {
         qWarning("Failed to delete entry from AWS.");
     }
+
+    dialog.close();
 }
 
 AddressEntry AddressBookModel::getEntry(int row) const {
@@ -149,7 +155,7 @@ void AddressBookModel::updateEntry(int row, const AddressEntry& entry) {
     if (row < 0 || row >= m_entries.size())
         return;
 
-    // DetailPageWidget에서 이미 원본 키가 올바르게 세팅되어 있다.
+    // DetailPageWidget에서 관리하는 멤버 변수로 직접 접근
     m_entries[row] = entry;
     emit dataChanged(index(row, 0), index(row, columnCount() - 1));
 
@@ -169,13 +175,18 @@ void AddressBookModel::setEntries(const QList<AddressEntry>& entries) {
 }
 
 void AddressBookModel::addEntry(const AddressEntry& entry) {
-    AddressEntry copy = entry;
-    if (copy.originalName().isEmpty()) copy.setOriginalName(copy.name());
-    if (copy.originalPhoneNumber().isEmpty()) copy.setOriginalPhoneNumber(copy.phoneNumber());
-
     beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
-    m_entries.append(copy);
+    m_entries.append(entry);
     endInsertRows();
 
-    saveAddressBookToAWS(m_entries, getAwsSaveUrl());
+    // 통신 중 다이얼로그
+    LoadingDialog dialog;
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    if (!saveAddressBookToAWS(m_entries, getAwsSaveUrl())) {
+        qWarning("Failed to save data to AWS.");
+    }
+
+    dialog.close();
 }

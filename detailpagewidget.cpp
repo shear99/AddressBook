@@ -12,11 +12,9 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent)
     setupUI();
     populateFields();
 
-    // 만약 기존 원본 키가 비어있다면, 현재 값을 최초 원본값으로 저장.
-    if(m_entry.originalName().isEmpty())
-        m_entry.setOriginalName(m_entry.name());
-    if(m_entry.originalPhoneNumber().isEmpty())
-        m_entry.setOriginalPhoneNumber(m_entry.phoneNumber());
+    // 현재 값을 최초 원본값으로 저장.
+    setOriginalName(m_entry.name());
+    setOriginalPhoneNumber(m_entry.phoneNumber());
 }
 
 void DetailPageWidget::setupUI() {
@@ -58,7 +56,7 @@ void DetailPageWidget::onSaveClicked() {
         return;
     }
 
-    // 전화번호 양식 검증: 000-0000-0000 형식인지 체크
+    // 전화번호 양식 검증
     QString phone = phoneEdit->text().trimmed();
     QRegularExpression regex("^\\d{3}-\\d{4}-\\d{4}$");
     QRegularExpressionMatch match = regex.match(phone);
@@ -67,22 +65,26 @@ void DetailPageWidget::onSaveClicked() {
         return;
     }
 
-    // 사용자가 입력한 새 값을 임시로 보관
+    // 새 값 임시 저장
     QString newName = nameEdit->text();
     QString newPhone = phone;
+    bool isModified = (m_originalName != newName) || (m_originalPhoneNumber != newPhone);
 
-    // 수정 여부 판단: 원본과 새 값 비교
-    bool isModified = (m_entry.originalName() != newName) || (m_entry.originalPhoneNumber() != newPhone);
+    // ---------- 다이얼로그 띄우기 ----------
+    LoadingDialog dialog(this);
+    dialog.show();
+    QCoreApplication::processEvents();  // UI 업데이트 강제
 
-    // 수정된 경우, 기존 튜플을 삭제 요청
+    // 기존 항목 삭제 요청 (수정된 경우에만)
     if (isModified) {
         if (!deleteAddressEntryFromAWS(m_entry, getAwsSaveUrl())) {
+            dialog.close();  // 닫기 꼭 해야 함!
             QMessageBox::warning(this, tr("삭제 오류"), tr("이전 튜플 삭제에 실패했습니다."));
             return;
         }
     }
 
-    // 사용자가 입력한 값으로 업데이트
+    // 업데이트
     m_entry.setName(newName);
     m_entry.setPhoneNumber(newPhone);
     m_entry.setEmail(emailEdit->text());
@@ -90,11 +92,12 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setPosition(positionEdit->text());
     m_entry.setNickname(nicknameEdit->text());
 
-    // 수정된 경우, 삭제가 성공하면 원본 키를 새 값으로 갱신
     if (isModified) {
-        m_entry.setOriginalName(newName);
-        m_entry.setOriginalPhoneNumber(newPhone);
+        setOriginalName(newName);
+        setOriginalPhoneNumber(newPhone);
     }
+
+    dialog.close();  // 통신 종료 후 닫기
 
     m_saved = true;
     emit entryUpdated(m_entry);
@@ -113,4 +116,14 @@ void DetailPageWidget::closeEvent(QCloseEvent* event) {
         emit detailPageClosed();
     }
     QWidget::closeEvent(event);
+}
+
+void DetailPageWidget::setOriginalName(const QString& name)
+{
+    this->m_originalName = name;
+}
+
+void DetailPageWidget::setOriginalPhoneNumber(const QString& phoneNumber)
+{
+    this->m_originalPhoneNumber = phoneNumber;
 }

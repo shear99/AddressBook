@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QProcessEnvironment>
 #include "AddressEntry.h"
+#include "loadingdialog.h"
 
 /// Lambda URL을 환경 변수에서 가져오기
 inline QUrl getAwsLoadUrl() {
@@ -59,6 +60,11 @@ inline bool deleteAddressEntryFromAWS(const AddressEntry& entry, const QUrl& url
 inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
     QList<AddressEntry> entries;
 
+    // 통신 중 다이얼로그 띄우기
+    LoadingDialog dialog;
+    dialog.show();
+    QCoreApplication::processEvents();
+
     QNetworkAccessManager manager;
     QNetworkRequest request(url);
     qDebug() << "[LOAD] Requesting GET from:" << url.toString();
@@ -68,6 +74,8 @@ inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
     QEventLoop loop;
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
+
+    dialog.close();  // 통신 끝나면 다이얼로그 닫기
 
     if (reply->error() != QNetworkReply::NoError) {
         qWarning() << "[LOAD] Network error:" << reply->errorString();
@@ -132,6 +140,8 @@ inline bool saveAddressBookToAWS(const QList<AddressEntry> &entries, const QUrl 
         obj["position"] = entry.position();
         obj["nickname"] = entry.nickname();
         obj["favorite"] = entry.favorite();
+
+        // 기존에는 originalName, originalPhoneNumber을 포함했으나 이제는 포함하지 않음.
         array.append(obj);
     }
 
@@ -142,7 +152,6 @@ inline bool saveAddressBookToAWS(const QList<AddressEntry> &entries, const QUrl 
     QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
 
     qDebug() << "[SAVE] Posting to:" << url.toString();
-    //qDebug() << "[SAVE] JSON Payload:\n" << jsonData;
 
     QNetworkAccessManager manager;
     QNetworkRequest request(url);

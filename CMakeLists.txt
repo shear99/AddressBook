@@ -38,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         envloader.h
         resources.qrc
         heartdelegate.h heartdelegate.cpp
+        loadingdialog.h
     )
 else()
     if(ANDROID)

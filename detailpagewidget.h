@@ -13,6 +13,8 @@ class DetailPageWidget : public QWidget {
 public:
     explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent = nullptr);
     AddressEntry updatedEntry() const; // 수정된 데이터를 외부에서 가져올 수 있도록
+    void setOriginalName(const QString& name);
+    void setOriginalPhoneNumber(const QString& phoneNumber);
 
 signals:
     void entryUpdated(const AddressEntry& updatedEntry); // 저장 클릭 시 signal로 알림
@@ -41,6 +43,9 @@ private:
     void populateFields();
 
     bool m_saved = false;
+
+    QString m_originalName;
+    QString m_originalPhoneNumber;
 };
 
 #endif // DETAILPAGEWIDGET_H
