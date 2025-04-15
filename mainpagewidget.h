@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "addressbookmodel.h"
+#include "multicolumnfilterproxymodel.h"
 
 namespace Ui {
 class MainPageWidget;
@@ -19,6 +20,7 @@ public:
 private:
     Ui::MainPageWidget *ui;
     AddressBookModel* model = nullptr;
+    MultiColumnFilterProxyModel* proxyModel;
 };
 
 #endif // MAINPAGEWIDGET_H

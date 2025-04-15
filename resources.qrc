@@ -23,4 +23,8 @@
         <file>fonts/GmarketSansTTFLight.ttf</file>
         <file>fonts/GmarketSansTTFMedium.ttf</file>
     </qresource>
+    <qresource prefix="/mainpageImage">
+        <file>mainpageImage/search_30dp_000000.png</file>
+        <file>mainpageImage/search_30dp_999999.png</file>
+    </qresource>
 </RCC>

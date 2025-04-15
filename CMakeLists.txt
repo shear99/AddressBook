@@ -44,6 +44,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         fontupdate.cpp
         ImageEntry.h
 
+        multicolumnfilterproxymodel.h
+
 
 
 

@@ -26,23 +26,16 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>581</x>
      <y>530</y>
-     <width>282</width>
+     <width>191</width>
      <height>80</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <property name="spacing">
      <number>10</number>
     </property>
-    <item>
-     <widget class="QPushButton" name="searchButton">
-      <property name="text">
-       <string>검색</string>
-      </property>
-     </widget>
-    </item>
     <item>
      <widget class="QPushButton" name="addButton">
       <property name="text">
@@ -59,6 +52,57 @@
     </item>
    </layout>
   </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">image: url(:/mainpageImage/mainpageImage/search_30dp_000000.png);
+padding-left: 5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="searchText">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid gray;
+color: rgb(0, 0, 0);
+border-radius: 10px;
+padding: 0 8px;
+background: white;
+padding-left: 19px;</string>
+   </property>
+   <property name="inputMask">
+    <string/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft</set>
+   </property>
+  </widget>
+  <zorder>addressTableView</zorder>
+  <zorder>horizontalLayoutWidget</zorder>
+  <zorder>searchText</zorder>
+  <zorder>label</zorder>
  </widget>
  <resources/>
  <connections/>
