@@ -18,16 +18,25 @@ set(PROJECT_SOURCES
     widget.cpp
     widget.h
     widget.ui
-
     addressbookmodel.cpp
     addressbookmodel.h
     detailpagewidget.h
     detailpagewidget.cpp
+    detailpagewidget.ui
     addressentry.h
     util.h
     mainpagewidget.h
     mainpagewidget.cpp
     mainpagewidget.ui
+    fontupdate.h
+    fontupdate.cpp
+    ImageEntry.h
+    ImageEntry.cpp
+    heartdelegate.h
+    heartdelegate.cpp
+    loadingdialog.h
+    multicolumnfilterproxymodel.h
+    multicolumnfilterproxymodel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -37,19 +46,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         .env
         envloader.h
         resources.qrc
-        heartdelegate.h heartdelegate.cpp
-        loadingdialog.h
-        detailpagewidget.ui
-        fontupdate.h
-        fontupdate.cpp
-        ImageEntry.h
-
-        multicolumnfilterproxymodel.h
-
-
-
-
-
     )
 else()
     if(ANDROID)
