@@ -175,6 +175,13 @@ bool DetailPageWidget::eventFilter(QObject* watched, QEvent* event)
 
 void DetailPageWidget::onProfileImageClicked()
 {
+    // 추가 모드에서는 이미지 업로드 차단
+    if (m_isAddMode) {
+        QMessageBox::information(this, tr("알림"), 
+            tr("지금은 이미지를 업로드할 수 없습니다. 주소록에 추가한 후 사진을 업로드해주세요."));
+        return;
+    }
+
     // 읽기 전용 모드에서는 원본 이미지 보기
     if (ui->detailpageName->isReadOnly() && !m_isAddMode) {
         if (!m_originalS3Key.isEmpty()) {
@@ -502,8 +509,8 @@ void DetailPageWidget::onSaveClicked() {
     dialog.show();
     QCoreApplication::processEvents();  // UI 업데이트 강제
 
-    // 기존 항목 삭제 요청 (수정된 경우에만)
-    if (isModified) {
+    // 기존 항목 삭제 요청 (수정된 경우에만, 추가 모드가 아닐 때만)
+    if (isModified && !m_isAddMode) {
         if (!deleteAddressEntryFromAWS(m_entry, getAwsSaveUrl())) {
             dialog.close();  // 닫기 꼭 해야 함!
             QMessageBox::warning(this, tr("삭제 오류"), tr("이전 튜플 삭제에 실패했습니다."));

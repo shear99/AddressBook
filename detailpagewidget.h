@@ -11,6 +11,7 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QPixmap>
 #include <QDesktopServices>
 #include <QTimer>
