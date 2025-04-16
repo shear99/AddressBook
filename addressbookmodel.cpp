@@ -175,8 +175,30 @@ void AddressBookModel::setEntries(const QList<AddressEntry>& entries) {
 }
 
 void AddressBookModel::addEntry(const AddressEntry& entry) {
-    beginInsertRows(QModelIndex(), m_entries.size(), m_entries.size());
-    m_entries.append(entry);
+    // 이름 기준으로 적절한 삽입 위치 찾기
+    int insertPos = 0;
+    for (int i = 0; i < m_entries.size(); ++i) {
+        if (entry.name().compare(m_entries[i].name(), Qt::CaseInsensitive) < 0) {
+            // 알파벳 순으로 현재 항목보다 먼저 오는 경우
+            insertPos = i;
+            break;
+        }
+        // 마지막까지 비교했는데 더 큰 경우, 맨 끝에 추가
+        if (i == m_entries.size() - 1) {
+            insertPos = m_entries.size();
+        }
+    }
+
+    // 빈 목록이면 첫 번째 위치에 추가
+    if (m_entries.isEmpty()) {
+        insertPos = 0;
+    }
+
+    qDebug() << "Adding entry" << entry.name() << "at position" << insertPos;
+
+    // 해당 위치에 항목 삽입
+    beginInsertRows(QModelIndex(), insertPos, insertPos);
+    m_entries.insert(insertPos, entry);
     endInsertRows();
 
     // 통신 중 다이얼로그

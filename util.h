@@ -57,8 +57,18 @@ inline bool saveToAWS(const QJsonObject &entryObj, const QUrl &url) {
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     
+    // 원본 이미지 URL이 있지만 original_key가 없는 경우 추가
+    QJsonObject modifiedObj = entryObj;
+    if (modifiedObj.contains("original_image_url") && !modifiedObj.contains("original_key")) {
+        QString originalUrl = modifiedObj["original_image_url"].toString();
+        QStringList parts = originalUrl.split(".s3.amazonaws.com/");
+        if (parts.size() > 1) {
+            modifiedObj["original_key"] = parts[1];
+        }
+    }
+    
     // 요청 JSON 생성
-    QJsonDocument doc(entryObj);
+    QJsonDocument doc(modifiedObj);
     QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
     
     qDebug() << "[SAVE] Posting single entry to:" << url.toString();
@@ -142,6 +152,17 @@ inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
             entry.setImageUrl(obj["image"].toString());
         }
         
+        // 원본 이미지 URL 로드
+        if (obj.contains("original_image_url")) {
+            entry.setOriginalImageUrl(obj["original_image_url"].toString());
+        }
+        // 기존 original_key 필드가 있는 경우 호환성 유지
+        else if (obj.contains("original_key")) {
+            QString bucketUrl = "https://contact-photo-bucket-001.s3.amazonaws.com/";
+            QString originalUrl = bucketUrl + obj["original_key"].toString();
+            entry.setOriginalImageUrl(originalUrl);
+        }
+        
         entries.append(entry);
     }
     qDebug() << "[LOAD] Parsed entry count:" << entries.size();
@@ -164,6 +185,17 @@ inline bool saveAddressBookToAWS(const QList<AddressEntry> &entries, const QUrl 
         // 이미지 URL 저장 확인
         if (!entry.imageUrl().isEmpty()) {
             obj["image"] = entry.imageUrl();
+        }
+        
+        // 원본 이미지 URL 저장 확인
+        if (!entry.originalImageUrl().isEmpty()) {
+            obj["original_image_url"] = entry.originalImageUrl();
+            
+            // 원본 키 추출 (original_key와의 호환성 유지)
+            QStringList parts = entry.originalImageUrl().split(".s3.amazonaws.com/");
+            if (parts.size() > 1) {
+                obj["original_key"] = parts[1];
+            }
         }
         
         array.append(obj);

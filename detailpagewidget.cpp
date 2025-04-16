@@ -197,18 +197,38 @@ void DetailPageWidget::fetchImageUrlFromDB()
                             qDebug() << "[DB Image] Entry doesn't have image URL";
                         }
                         
+                        // 원본 이미지 URL 확인
+                        if (entryObj.contains("original_image_url")) {
+                            QString originalUrl = entryObj["original_image_url"].toString();
+                            qDebug() << "[DB Image] Found original image URL:" << originalUrl;
+                            
+                            if (!originalUrl.isEmpty()) {
+                                m_entry.setOriginalImageUrl(originalUrl);
+                            }
+                        }
+                        
                         // 원본 이미지 키 확인
                         if (entryObj.contains("original_key")) {
                             m_originalS3Key = entryObj["original_key"].toString();
                             qDebug() << "[DB Image] Found original S3 key:" << m_originalS3Key;
+                            
+                            // 원본 이미지 URL이 없는 경우 생성
+                            if (m_entry.originalImageUrl().isEmpty()) {
+                                QString bucketUrl = "https://contact-photo-bucket-001.s3.amazonaws.com/";
+                                QString originalUrl = bucketUrl + m_originalS3Key;
+                                m_entry.setOriginalImageUrl(originalUrl);
+                                qDebug() << "[DB Image] Created original image URL from key:" << originalUrl;
+                            }
                         } else {
                             qDebug() << "[DB Image] Entry doesn't have original_key";
                             // 만약 original_key가 없고 image URL이 있으면, 이를 original_key로 사용
-                            if (!m_currentImageUrl.isEmpty()) {
+                            if (!m_currentImageUrl.isEmpty() && m_entry.originalImageUrl().isEmpty()) {
                                 // S3 URL에서 키 추출
                                 QStringList parts = m_currentImageUrl.split(".s3.amazonaws.com/");
                                 if (parts.size() > 1) {
                                     m_originalS3Key = parts[1];
+                                    QString originalUrl = m_currentImageUrl;
+                                    m_entry.setOriginalImageUrl(originalUrl);
                                     qDebug() << "[DB Image] Using image URL as original_key:" << m_originalS3Key;
                                 }
                             }
@@ -445,6 +465,11 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
             entryObj["memo"] = m_entry.memo();
             entryObj["image"] = imageUrl;
             entryObj["original_key"] = m_originalS3Key;
+            
+            // 원본 이미지 URL 필드 추가 
+            if (!m_entry.originalImageUrl().isEmpty()) {
+                entryObj["original_image_url"] = m_entry.originalImageUrl();
+            }
             
             // DB 업데이트 요청 보내기
             if (!saveToAWS(entryObj, getAwsSaveUrl())) {
@@ -741,8 +766,20 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
         return;
     }
     
-    // URL이 원본 이미지 키와 일치하는지 확인
-    bool isOriginalImage = (!m_originalS3Key.isEmpty() && imageUrl.endsWith(m_originalS3Key));
+    // URL이 원본 이미지 URL과 일치하는지 확인
+    bool isOriginalImage = false;
+    
+    // 1. 전달된 URL이 원본 이미지 URL과 일치하는지 확인
+    if (!m_entry.originalImageUrl().isEmpty() && imageUrl == m_entry.originalImageUrl()) {
+        isOriginalImage = true;
+        qDebug() << "[Image] URL matches original image URL";
+    }
+    // 2. 기존 m_originalS3Key 체크 방식 (호환성 유지)
+    else if (!m_originalS3Key.isEmpty() && imageUrl.endsWith(m_originalS3Key)) {
+        isOriginalImage = true;
+        qDebug() << "[Image] URL ends with original S3 key";
+    }
+    
     qDebug() << "[Image] Is original image:" << isOriginalImage;
     
     // 이미지 다운로드 요청
@@ -757,6 +794,7 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
     // 원본 이미지인 경우 크기 조정 없이 원본 그대로 표시할 것임을 알림
     if (isOriginalImage) {
         jsonObj["original"] = true;
+        qDebug() << "[Image] Requesting original image without resizing";
     }
     
     QJsonDocument doc(jsonObj);
