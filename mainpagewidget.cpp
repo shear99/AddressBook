@@ -19,9 +19,19 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     model = new AddressBookModel(this);
     proxyModel = new MultiColumnFilterProxyModel(this);
     proxyModel->setSourceModel(model);
+    
+    // 정렬 가능하도록 설정
+    proxyModel->setSortRole(Qt::DisplayRole);
+    proxyModel->setDynamicSortFilter(true);
 
     // 2. 테이블뷰에 프록시 모델 연결
     ui->addressTableView->setModel(proxyModel);
+    
+    // 정렬 기능 활성화
+    ui->addressTableView->setSortingEnabled(true);
+    
+    // 초기 정렬 설정 (이름 기준 오름차순)
+    ui->addressTableView->sortByColumn(1, Qt::AscendingOrder); // 1은 name 컬럼
 
     // 3. 검색창 연결
     connect(ui->searchText, &QLineEdit::textChanged, this, [=](const QString &text) {
@@ -46,6 +56,26 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     ui->addressTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->addressTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->addressTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+    
+    // 정렬 가능한 컬럼 설정 (name, phone, email, company, position만 정렬 가능)
+    QHeaderView* header = ui->addressTableView->horizontalHeader();
+    header->setSectionsClickable(true);
+    
+    // 첫 번째 열(즐겨찾기) 정렬 비활성화
+    header->setSectionResizeMode(0, QHeaderView::Fixed);
+    
+    // 각 컬럼의 정렬 설정
+    for (int i = 0; i < ui->addressTableView->model()->columnCount(); ++i) {
+        if (i >= 1 && i <= 5) { 
+            // 1:name, 2:phone, 3:email, 4:company, 5:position은 정렬 가능
+            header->setSortIndicatorShown(true);
+        } else {
+            // 다른 컬럼은 정렬 불가
+            if (i != 0) { // 즐겨찾기 열은 위에서 이미 설정함
+                header->setSectionResizeMode(i, QHeaderView::Interactive);
+            }
+        }
+    }
 
     // 9. 더블클릭 시 상세 편집 페이지로 이동
     connect(ui->addressTableView, &QTableView::doubleClicked, this, [=](const QModelIndex &proxyIndex) {
