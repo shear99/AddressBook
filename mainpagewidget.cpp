@@ -84,7 +84,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
         int row = sourceIndex.row();
         AddressEntry entry = model->getEntry(row);
-        DetailPageWidget* detailPage = new DetailPageWidget(entry);
+        DetailPageWidget* detailPage = new DetailPageWidget(entry, nullptr, false, nullptr);
         this->hide();
         detailPage->show();
 
@@ -100,7 +100,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     // 10. addButton 클릭 시 빈 DetailPageWidget을 열어서 새 항목 추가
     connect(ui->addButton, &QPushButton::clicked, this, [=]() {
         AddressEntry newEntry;
-        DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true);
+        DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true, model);
         this->hide();
         detailPage->show();
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {

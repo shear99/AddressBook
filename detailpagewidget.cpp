@@ -63,6 +63,72 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     modeSetting(m_isAddMode);
 }
 
+// 모델을 받는 생성자 구현
+DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode, AddressBookModel* model)
+    : QWidget(parent), m_entry(entry), ui(new Ui::DetailPageWidget), m_isAddMode(isAddMode)
+{
+    // 모델이 제공되면 중복 체크 함수 설정
+    if (model) {
+        m_duplicateCheckFunc = [model](const QString& name, const QString& phone) -> bool {
+            for (int i = 0; i < model->rowCount(); i++) {
+                AddressEntry entry = model->getEntry(i);
+                if (entry.name() == name && entry.phoneNumber() == phone) {
+                    return true; // 중복 발견
+                }
+            }
+            return false; // 중복 없음
+        };
+    }
+
+    ui->setupUi(this);
+
+    // 최대화/최소화 버튼 제거
+    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
+
+    setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
+
+    // 네트워크 매니저 초기화
+    m_networkManager = new QNetworkAccessManager(this);
+    
+    // 프로필 이미지 이벤트 필터 설치
+    ui->detailpageImage->installEventFilter(this);
+    ui->detailpageImage->setCursor(Qt::PointingHandCursor); // 클릭 가능함을 나타내는 커서
+    
+    // 기본 필드 설정 (텍스트 정보)
+    populateFields();
+    
+    // DB에서 이미지 URL 조회 및 로드 (비동기)
+    if (m_isAddMode == false) {
+        fetchImageUrlFromDB();
+    }
+    else {
+        // 기본 이미지 로드 (추가 모드)
+        if (!m_entry.imageUrl().isEmpty()) {
+            downloadImageFromS3(m_entry.imageUrl());
+        }
+    }
+
+    connect(ui->detailpagesaveButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
+    connect(ui->detailpageexitButton, &QPushButton::clicked, this, &DetailPageWidget::closeWindow);
+    connect(ui->detailpageeditButton, &QPushButton::clicked, this, &DetailPageWidget::onEditButtonClicked);
+
+    // 현재 값을 최초 원본값으로 저장.
+    setOriginalName(m_entry.name());
+    setOriginalPhoneNumber(m_entry.phoneNumber());
+
+    //초기 스타일 시트 저장
+    origNameStyle = ui->detailpageName->styleSheet();
+    origPhoneStyle = ui->detailpagePhone->styleSheet();
+    origMailStyle = ui->detailpageMail->styleSheet();
+    origCompanyStyle = ui->detailpageCompany->styleSheet();
+    origPositionStyle = ui->detailpagePosition->styleSheet();
+    origNicknameStyle = ui->detailpageNickname->styleSheet();
+    origMemoStyle = ui->detailpageNotice->styleSheet();
+
+    modeSetting(m_isAddMode);
+}
+
 // DB에서 이미지 URL 조회
 void DetailPageWidget::fetchImageUrlFromDB()
 {
@@ -502,6 +568,18 @@ void DetailPageWidget::onSaveClicked() {
     // 새 값 임시 저장
     QString newName = ui->detailpageName->text();
     QString newPhone = phone;
+    
+    // 추가 모드에서 중복 체크 함수 호출
+    if (m_isAddMode && m_duplicateCheckFunc) {
+        bool isDuplicate = m_duplicateCheckFunc(newName, newPhone);
+        
+        if (isDuplicate) {
+            QMessageBox::warning(this, tr("중복 오류"), 
+                tr("동일한 이름과 전화번호를 가진 연락처가 이미 존재합니다."));
+            return;
+        }
+    }
+    
     bool isModified = (m_originalName != newName) || (m_originalPhoneNumber != newPhone);
 
     // ---------- 다이얼로그 띄우기 ----------

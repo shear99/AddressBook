@@ -20,16 +20,21 @@
 #include "fontupdate.h"
 #include "ui_detailpagewidget.h"
 #include "loadingdialog.h"
+#include "addressbookmodel.h"
 
 namespace Ui {
 class DetailPageWidget;
 }
+
+// 중복 체크를 위한 함수 포인터 타입 정의
+typedef std::function<bool(const QString&, const QString&)> DuplicateCheckFunction;
 
 class DetailPageWidget : public QWidget {
     Q_OBJECT
 
 public:
     explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent = nullptr, bool isAddMode = false);
+    explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode, AddressBookModel* model);
     ~DetailPageWidget();
     AddressEntry updatedEntry() const; // 수정된 데이터를 외부에서 가져올 수 있도록
     void setOriginalName(const QString& name);
@@ -61,6 +66,7 @@ private:
     bool m_isAddMode = false;
     QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle, origMemoStyle;
     AddressEntry m_entry;
+    DuplicateCheckFunction m_duplicateCheckFunc = nullptr;
 
     QPushButton* saveButton;
 
