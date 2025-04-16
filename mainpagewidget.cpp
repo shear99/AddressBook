@@ -93,6 +93,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
             this->show();
+            detailPage->deleteLater();
         });
     });
 
@@ -107,6 +108,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
             this->show();
+            detailPage->deleteLater();
         });
     });
 
