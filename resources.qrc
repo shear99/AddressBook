@@ -17,6 +17,8 @@
         <file>detailpageImage/edit_20dp_999999.png</file>
         <file>detailpageImage/box_20dp_999999.png</file>
         <file>detailpageImage/person_add_30dp_000000.png</file>
+        <file>detailpageImage/person_add_30dp_FFFFFF.png</file>
+        <file>detailpageImage/person_remove_30dp_FFFFFF.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file>fonts/GmarketSansTTFBold.ttf</file>

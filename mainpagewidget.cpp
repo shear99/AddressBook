@@ -15,6 +15,10 @@ MainPageWidget::MainPageWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // setToolTip
+    ui->addButton->setToolTip("Add new");
+    ui->deleteButton->setToolTip("Delete");
+
     // 1. 모델 및 프록시 모델 생성
     model = new AddressBookModel(this);
     proxyModel = new MultiColumnFilterProxyModel(this);
