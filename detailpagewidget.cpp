@@ -290,15 +290,36 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
     loadingDialog->show();
     QCoreApplication::processEvents();
     
-    // 파일 읽기
-    QFile file(imagePath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "[Image] Failed to open file:" << file.errorString();
+    // 이미지 로드 및 크기 축소
+    QImage originalImage(imagePath);
+    if (originalImage.isNull()) {
+        qDebug() << "[Image] Failed to load image:" << imagePath;
         QMessageBox::warning(this, tr("파일 오류"), tr("이미지 파일을 열 수 없습니다."));
         loadingDialog->close();
         loadingDialog->deleteLater();
         return;
     }
+    
+    // 이미지 크기 확인 및 축소
+    int maxWidth = 1024;  // 최대 너비
+    int maxHeight = 1024; // 최대 높이
+    QImage resizedImage = originalImage;
+    
+    // 이미지가 최대 크기보다 크면 비율을 유지하면서 축소
+    if (originalImage.width() > maxWidth || originalImage.height() > maxHeight) {
+        resizedImage = originalImage.scaled(maxWidth, maxHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        qDebug() << "[Image] Resized image from" << originalImage.width() << "x" << originalImage.height() 
+                 << "to" << resizedImage.width() << "x" << resizedImage.height();
+    }
+    
+    // 이미지를 메모리 버퍼에 저장 (JPEG 형식, 품질 80%)
+    QByteArray fileData;
+    QBuffer buffer(&fileData);
+    buffer.open(QIODevice::WriteOnly);
+    resizedImage.save(&buffer, "JPEG", 80);
+    buffer.close();
+    
+    qDebug() << "[Image] Compressed image size:" << fileData.size() << "bytes";
     
     // S3에 업로드할 임시 파일명 생성 (uploads/ 경로 사용)
     QString fileName = QString("uploads/%1_%2.jpg")
@@ -311,11 +332,6 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
     qDebug() << "[Image] Lambda URL:" << lambdaUrl.toString();
     QNetworkRequest request(lambdaUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    
-    // 이미지 데이터 읽기
-    QByteArray fileData = file.readAll();
-    file.close();
-    qDebug() << "[Image] Read file size:" << fileData.size() << "bytes";
     
     // Base64로 이미지 인코딩
     QByteArray base64Data = fileData.toBase64();
@@ -390,6 +406,34 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
             
             // AddressEntry 업데이트
             m_entry.setImageUrl(imageUrl);
+            
+            // DB에 즉시 업데이트하기 위한 코드 추가
+            LoadingDialog dialog(this);
+            dialog.show();
+            QCoreApplication::processEvents(); // UI 업데이트 강제
+            
+            // DB에 즉시 업데이트하기 위한 JSON 생성
+            QJsonObject entryObj;
+            entryObj["name"] = m_entry.name();
+            entryObj["phoneNumber"] = m_entry.phoneNumber();
+            entryObj["email"] = m_entry.email();
+            entryObj["company"] = m_entry.company();
+            entryObj["position"] = m_entry.position();
+            entryObj["nickname"] = m_entry.nickname();
+            entryObj["favorite"] = m_entry.favorite();
+            entryObj["memo"] = m_entry.memo();
+            entryObj["image"] = imageUrl;
+            entryObj["original_key"] = m_originalS3Key;
+            
+            // DB 업데이트 요청 보내기
+            if (!saveToAWS(entryObj, getAwsSaveUrl())) {
+                dialog.close();
+                QMessageBox::warning(this, tr("DB 업데이트 오류"), tr("이미지 URL을 DB에 저장하는데 실패했습니다."));
+            } else {
+                qDebug() << "[Image] DB updated with new image URL";
+            }
+            
+            dialog.close();
         } catch (const std::exception& e) {
             qDebug() << "[Image] Exception during image processing:" << e.what();
             QMessageBox::warning(this, tr("이미지 처리 오류"), tr("이미지 처리 중 오류가 발생했습니다."));
@@ -753,6 +797,41 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
 //창 닫기
 void DetailPageWidget::closeWindow()
 {
+    // 변경사항 감지
+    bool isModified = false;
+    
+    // 원본 이름, 전화번호와 현재 값 비교
+    if (m_originalName != ui->detailpageName->text() || 
+        m_originalPhoneNumber != ui->detailpagePhone->text()) {
+        isModified = true;
+    }
+    
+    // 이메일, 회사, 직책, 별명, 메모 등 변경 확인
+    if (m_entry.email() != ui->detailpageMail->text() ||
+        m_entry.company() != ui->detailpageCompany->text() ||
+        m_entry.position() != ui->detailpagePosition->text() ||
+        m_entry.nickname() != ui->detailpageNickname->text() ||
+        m_entry.memo() != ui->detailpageNotice->text()) {
+        isModified = true;
+    }
+    
+    // 이미지 URL 변경 확인
+    if (!m_currentImageUrl.isEmpty() && m_currentImageUrl != m_entry.imageUrl()) {
+        isModified = true;
+    }
+    
+    // 변경사항이 있으면 경고 메시지 표시
+    if (isModified && !m_saved) {
+        QMessageBox::StandardButton reply = QMessageBox::warning(this, 
+            tr("변경사항 저장 안됨"), 
+            tr("변경사항이 저장되지 않았습니다. 계속하시겠습니까?"),
+            QMessageBox::Yes | QMessageBox::No);
+            
+        if (reply == QMessageBox::No) {
+            return; // 저장하지 않고 닫기 취소
+        }
+    }
+    
     close();
 }
 
@@ -761,7 +840,44 @@ AddressEntry DetailPageWidget::updatedEntry() const {
 }
 
 void DetailPageWidget::closeEvent(QCloseEvent* event) {
+    // 변경사항이 있고 저장되지 않았다면
     if (!m_saved) {
+        // 변경사항 감지 (closeWindow와 동일한 로직)
+        bool isModified = false;
+        
+        // 원본 이름, 전화번호와 현재 값 비교
+        if (m_originalName != ui->detailpageName->text() || 
+            m_originalPhoneNumber != ui->detailpagePhone->text()) {
+            isModified = true;
+        }
+        
+        // 이메일, 회사, 직책, 별명, 메모 등 변경 확인
+        if (m_entry.email() != ui->detailpageMail->text() ||
+            m_entry.company() != ui->detailpageCompany->text() ||
+            m_entry.position() != ui->detailpagePosition->text() ||
+            m_entry.nickname() != ui->detailpageNickname->text() ||
+            m_entry.memo() != ui->detailpageNotice->text()) {
+            isModified = true;
+        }
+        
+        // 이미지 URL 변경 확인
+        if (!m_currentImageUrl.isEmpty() && m_currentImageUrl != m_entry.imageUrl()) {
+            isModified = true;
+        }
+        
+        // 실제로 변경된 사항이 있을 때만 경고 메시지 표시
+        if (isModified) {
+            QMessageBox::StandardButton reply = QMessageBox::warning(this, 
+                tr("변경사항 저장 안됨"), 
+                tr("변경사항이 저장되지 않았습니다. 계속하시겠습니까?"),
+                QMessageBox::Yes | QMessageBox::No);
+                
+            if (reply == QMessageBox::No) {
+                event->ignore(); // 닫기 취소
+                return;
+            }
+        }
+        
         emit closedWithoutSaving();
         emit detailPageClosed();
     }

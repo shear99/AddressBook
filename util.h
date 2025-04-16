@@ -50,6 +50,37 @@ inline bool deleteAddressEntryFromAWS(const AddressEntry& entry, const QUrl& url
     reply->deleteLater();
     return true;
 }
+
+// 단일 항목을 AWS에 저장
+inline bool saveToAWS(const QJsonObject &entryObj, const QUrl &url) {
+    QNetworkAccessManager manager;
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    
+    // 요청 JSON 생성
+    QJsonDocument doc(entryObj);
+    QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
+    
+    qDebug() << "[SAVE] Posting single entry to:" << url.toString();
+    qDebug() << "[SAVE] JSON payload:" << jsonData;
+    
+    QNetworkReply *reply = manager.post(request, jsonData);
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning() << "[SAVE] Failed to save entry to AWS:" << reply->errorString();
+        reply->deleteLater();
+        return false;
+    }
+    
+    QByteArray responseData = reply->readAll();
+    qDebug() << "[SAVE] Server response:" << responseData;
+    reply->deleteLater();
+    return true;
+}
+
 /// AWS Lambda를 통해 주소록 데이터를 불러오기
 inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
     QList<AddressEntry> entries;
@@ -105,6 +136,12 @@ inline QList<AddressEntry> loadAddressBookFromAWS(const QUrl &url) {
         entry.setNickname(obj["nickname"].toString());
         entry.setFavorite(obj["favorite"].toBool());
         entry.setMemo(obj["memo"].toString());
+        
+        // 이미지 URL 로드 추가
+        if (obj.contains("image")) {
+            entry.setImageUrl(obj["image"].toString());
+        }
+        
         entries.append(entry);
     }
     qDebug() << "[LOAD] Parsed entry count:" << entries.size();
@@ -123,6 +160,12 @@ inline bool saveAddressBookToAWS(const QList<AddressEntry> &entries, const QUrl 
         obj["nickname"] = entry.nickname();
         obj["favorite"] = entry.favorite();
         obj["memo"] = entry.memo();
+        
+        // 이미지 URL 저장 확인
+        if (!entry.imageUrl().isEmpty()) {
+            obj["image"] = entry.imageUrl();
+        }
+        
         array.append(obj);
     }
     // 배열을 "results"라는 키로 감싸기
