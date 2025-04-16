@@ -10,6 +10,7 @@ class ImageEntry : public QLabel
     QString m_processed_key;
 
 public:
+    // Getters
     QString getImage() const { return m_image; }
     QString getOriginal_key() const { return m_original_key; }
     QString getProcessed_key() const { return m_processed_key; }

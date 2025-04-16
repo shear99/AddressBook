@@ -15,7 +15,7 @@ class AddressBookModel : public QAbstractTableModel {
 public:
     explicit AddressBookModel(QObject* parent = nullptr);
 
-    // QAbstractTableModel 필수 구현 함수
+    // Required QAbstractTableModel implementations
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -23,7 +23,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    // 커스텀 함수
+    // Custom implementations for address book management (QAbstractTableModel virtual functions)
     void addEntry(const AddressEntry& entry);
     void removeEntry(int row);
     AddressEntry getEntry(int row) const;

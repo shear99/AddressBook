@@ -26,17 +26,20 @@ namespace Ui {
 class DetailPageWidget;
 }
 
-// 중복 체크를 위한 함수 포인터 타입 정의
+// Function pointer type for duplicate contact checking
 typedef std::function<bool(const QString&, const QString&)> DuplicateCheckFunction;
 
 class DetailPageWidget : public QWidget {
     Q_OBJECT
 
 public:
+    // Constructors for different initialization scenarios
     explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent = nullptr, bool isAddMode = false);
     explicit DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode, AddressBookModel* model);
     ~DetailPageWidget();
-    AddressEntry updatedEntry() const; // 수정된 데이터를 외부에서 가져올 수 있도록
+
+    // Core functionality for data management
+    AddressEntry updatedEntry() const;
     void setOriginalName(const QString& name);
     void setOriginalPhoneNumber(const QString& phoneNumber);
     void modeSetting(bool _AddMode);
@@ -44,46 +47,52 @@ public:
     void updateImageUI(const QString& imageUrl);
 
 signals:
-    void entryUpdated(const AddressEntry& updatedEntry); // 저장 클릭 시 signal로 알림
-    void closedWithoutSaving(); // 저장 안 하고 닫힐 때용
-    void detailPageClosed();    // save 버튼을 눌렀을때 시그널
+    // Signals for data synchronization with AddressBookModel
+    void entryUpdated(const AddressEntry& updatedEntry);
+    void closedWithoutSaving();
+    void detailPageClosed();
 
 protected:
+    // Event handling for window management
     void closeEvent(QCloseEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-    void onSaveClicked();
-    void closeWindow();
-    void onEditButtonClicked();
-    void onProfileImageClicked();
-    void uploadImageToLambda(const QString& imagePath);
-    void onImageUploadFinished(QNetworkReply* reply);
-    void downloadImageFromS3(const QString& imageUrl);
-    void fetchImageUrlFromDB();
+    // Core operations for data and image management
+    void onSaveClicked();           // Save contact data to AWS
+    void closeWindow();             // Handle window closing
+    void onEditButtonClicked();     // Toggle edit mode
+    void onProfileImageClicked();   // Handle image selection/display
+    void uploadImageToLambda(const QString& imagePath);  // Upload image to AWS
+    void onImageUploadFinished(QNetworkReply* reply);    // Handle image upload completion
+    void downloadImageFromS3(const QString& imageUrl);   // Download image from AWS
+    void fetchImageUrlFromDB();     // Retrieve image URL from AWS
 
 private:
+    // State management
     bool m_isAddMode = false;
     QString origNameStyle, origPhoneStyle, origMailStyle, origCompanyStyle, origPositionStyle, origNicknameStyle, origMemoStyle;
     AddressEntry m_entry;
     DuplicateCheckFunction m_duplicateCheckFunc = nullptr;
 
+    // UI components
     QPushButton* saveButton;
+    Ui::DetailPageWidget *ui;
 
+    // UI management
     void setupUI();
     void populateFields();
     void editInitialSettings();
     bool m_saved = false;
 
+    // Data tracking
     QString m_originalName;
     QString m_originalPhoneNumber;
     
-    // 프로필 이미지 관련 변수
+    // AWS image management
     QString m_currentImageUrl;
     QString m_originalS3Key;
     QNetworkAccessManager* m_networkManager;
-
-    Ui::DetailPageWidget *ui;
 };
 
 #endif // DETAILPAGEWIDGET_H

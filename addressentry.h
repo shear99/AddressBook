@@ -23,6 +23,7 @@ public:
         m_memo(memo),
         m_imageUrl(imageUrl)
     {}
+
     // Getters
     QString name() const { return m_name; }
     QString phoneNumber() const { return m_phoneNumber; }
@@ -34,6 +35,7 @@ public:
     QString memo() const { return m_memo; }
     QString imageUrl() const { return m_imageUrl; }
     QString originalImageUrl() const { return m_originalImageUrl; }
+
     // Setters
     void setName(const QString& name) { m_name = name; }
     void setPhoneNumber(const QString& phoneNumber) { m_phoneNumber = phoneNumber; }
@@ -45,6 +47,7 @@ public:
     void setMemo(const QString & memo) { m_memo = memo; }
     void setImageUrl(const QString& url) { m_imageUrl = url; }
     void setOriginalImageUrl(const QString& url) { m_originalImageUrl = url; }
+    
 private:
     QString m_name;
     QString m_phoneNumber;

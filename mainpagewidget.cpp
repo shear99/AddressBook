@@ -85,14 +85,17 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         int row = sourceIndex.row();
         AddressEntry entry = model->getEntry(row);
         DetailPageWidget* detailPage = new DetailPageWidget(entry, nullptr, false, nullptr);
-        this->hide();
+        
+        // 메인 페이지 숨기는 대신 비활성화
+        this->setEnabled(false);
         detailPage->show();
 
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {
             model->updateEntry(row, updatedEntry);
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
-            this->show();
+            // 메인 페이지 다시 활성화
+            this->setEnabled(true);
             detailPage->deleteLater();
         });
     });
@@ -101,13 +104,17 @@ MainPageWidget::MainPageWidget(QWidget *parent)
     connect(ui->addButton, &QPushButton::clicked, this, [=]() {
         AddressEntry newEntry;
         DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true, model);
-        this->hide();
+        
+        // 메인 페이지 숨기는 대신 비활성화
+        this->setEnabled(false);
         detailPage->show();
+        
         connect(detailPage, &DetailPageWidget::entryUpdated, this, [=](const AddressEntry &updatedEntry) {
             model->addEntry(updatedEntry);
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
-            this->show();
+            // 메인 페이지 다시 활성화
+            this->setEnabled(true);
             detailPage->deleteLater();
         });
     });

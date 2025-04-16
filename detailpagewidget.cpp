@@ -14,44 +14,35 @@
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode)
     : QWidget(parent), m_entry(entry),ui(new Ui::DetailPageWidget),m_isAddMode(isAddMode)
 {
-    ui->setupUi(this);
-
-    // 최대화/최소화 버튼 제거
-    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
-
-    setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
-
-    // 네트워크 매니저 초기화
+    // Initialize network manager for AWS communication
     m_networkManager = new QNetworkAccessManager(this);
     
-    // 프로필 이미지 이벤트 필터 설치
+    // Setup UI and event filters
+    ui->setupUi(this);
     ui->detailpageImage->installEventFilter(this);
-    ui->detailpageImage->setCursor(Qt::PointingHandCursor); // 클릭 가능함을 나타내는 커서
+    ui->detailpageImage->setCursor(Qt::PointingHandCursor);
     
-    // 기본 필드 설정 (텍스트 정보)
+    // Initialize fields and load data
     populateFields();
     
-    // DB에서 이미지 URL 조회 및 로드 (비동기)
+    // Load image from AWS if not in add mode
     if (m_isAddMode == false) {
         fetchImageUrlFromDB();
     }
-    else {
-        // 기본 이미지 로드 (추가 모드)
-        if (!m_entry.imageUrl().isEmpty()) {
-            downloadImageFromS3(m_entry.imageUrl());
-        }
+    else if (!m_entry.imageUrl().isEmpty()) {
+        downloadImageFromS3(m_entry.imageUrl());
     }
 
+    // Connect signals for data synchronization
     connect(ui->detailpagesaveButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
     connect(ui->detailpageexitButton, &QPushButton::clicked, this, &DetailPageWidget::closeWindow);
     connect(ui->detailpageeditButton, &QPushButton::clicked, this, &DetailPageWidget::onEditButtonClicked);
 
-    // 현재 값을 최초 원본값으로 저장.
+    // Store original values for change tracking
     setOriginalName(m_entry.name());
     setOriginalPhoneNumber(m_entry.phoneNumber());
 
-    //초기 스타일 시트 저장
+    // Store original styles for UI state management
     origNameStyle = ui->detailpageName->styleSheet();
     origPhoneStyle = ui->detailpagePhone->styleSheet();
     origMailStyle = ui->detailpageMail->styleSheet();
@@ -67,57 +58,48 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode, AddressBookModel* model)
     : QWidget(parent), m_entry(entry), ui(new Ui::DetailPageWidget), m_isAddMode(isAddMode)
 {
-    // 모델이 제공되면 중복 체크 함수 설정
+    // Setup duplicate check function if model is provided
     if (model) {
         m_duplicateCheckFunc = [model](const QString& name, const QString& phone) -> bool {
             for (int i = 0; i < model->rowCount(); i++) {
                 AddressEntry entry = model->getEntry(i);
                 if (entry.name() == name && entry.phoneNumber() == phone) {
-                    return true; // 중복 발견
+                    return true;
                 }
             }
-            return false; // 중복 없음
+            return false;
         };
     }
 
-    ui->setupUi(this);
-
-    // 최대화/최소화 버튼 제거
-    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
-
-    setWindowFlags(Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
-
-    // 네트워크 매니저 초기화
+    // Initialize network manager for AWS communication
     m_networkManager = new QNetworkAccessManager(this);
     
-    // 프로필 이미지 이벤트 필터 설치
+    // Setup UI and event filters
+    ui->setupUi(this);
     ui->detailpageImage->installEventFilter(this);
-    ui->detailpageImage->setCursor(Qt::PointingHandCursor); // 클릭 가능함을 나타내는 커서
+    ui->detailpageImage->setCursor(Qt::PointingHandCursor);
     
-    // 기본 필드 설정 (텍스트 정보)
+    // Initialize fields and load data
     populateFields();
     
-    // DB에서 이미지 URL 조회 및 로드 (비동기)
+    // Load image from AWS if not in add mode
     if (m_isAddMode == false) {
         fetchImageUrlFromDB();
     }
-    else {
-        // 기본 이미지 로드 (추가 모드)
-        if (!m_entry.imageUrl().isEmpty()) {
-            downloadImageFromS3(m_entry.imageUrl());
-        }
+    else if (!m_entry.imageUrl().isEmpty()) {
+        downloadImageFromS3(m_entry.imageUrl());
     }
 
+    // Connect signals for data synchronization
     connect(ui->detailpagesaveButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
     connect(ui->detailpageexitButton, &QPushButton::clicked, this, &DetailPageWidget::closeWindow);
     connect(ui->detailpageeditButton, &QPushButton::clicked, this, &DetailPageWidget::onEditButtonClicked);
 
-    // 현재 값을 최초 원본값으로 저장.
+    // Store original values for change tracking
     setOriginalName(m_entry.name());
     setOriginalPhoneNumber(m_entry.phoneNumber());
 
-    //초기 스타일 시트 저장
+    // Store original styles for UI state management
     origNameStyle = ui->detailpageName->styleSheet();
     origPhoneStyle = ui->detailpagePhone->styleSheet();
     origMailStyle = ui->detailpageMail->styleSheet();
@@ -135,10 +117,8 @@ void DetailPageWidget::fetchImageUrlFromDB()
     qDebug() << "[DB Image] Fetching image URL for name:" << m_entry.name() 
              << "phone:" << m_entry.phoneNumber();
     
-    // AWS Lambda URL 가져오기
+    // Prepare AWS Lambda request
     QUrl loadUrl = getAwsLoadUrl();
-    
-    // 요청 보내기
     QNetworkRequest request(loadUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     
@@ -152,89 +132,64 @@ void DetailPageWidget::fetchImageUrlFromDB()
     QJsonDocument doc(root);
     QByteArray jsonData = doc.toJson();
     
+    // Send request to AWS
     QNetworkReply* reply = m_networkManager->post(request, jsonData);
     
-    // 응답 처리
+    // Handle AWS response
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         reply->deleteLater();
         
+        // Check for network errors
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "[DB Image] Error fetching image URL:" << reply->errorString();
             return;
         }
         
         QByteArray responseData = reply->readAll();
-        qDebug() << "[DB Image] Response:" << responseData;
-        
         QJsonDocument responseDoc = QJsonDocument::fromJson(responseData);
         QJsonObject responseObj = responseDoc.object();
         
+        // Check if response contains results array
         if (responseObj.contains("results") && responseObj["results"].isArray()) {
             QJsonArray results = responseObj["results"].toArray();
-            qDebug() << "[DB Image] Results count:" << results.size();
             
+            // Process results if any exist
             if (results.size() > 0) {
                 for (int i = 0; i < results.size(); i++) {
                     QJsonObject entryObj = results[i].toObject();
                     
-                    // 연락처 확인
+                    // Find matching entry by phone number and name
                     if (entryObj["phoneNumber"].toString() == m_entry.phoneNumber() && 
                         entryObj["name"].toString() == m_entry.name()) {
                         
-                        qDebug() << "[DB Image] Found matching entry at index:" << i;
-                        
-                        // 이미지 URL 확인
+                        // Process image URL from AWS response
                         if (entryObj.contains("image")) {
                             QString imageUrl = entryObj["image"].toString();
-                            qDebug() << "[DB Image] Found image URL:" << imageUrl;
-                            
-                            // 이미지 URL 저장
                             if (!imageUrl.isEmpty()) {
                                 m_currentImageUrl = imageUrl;
                                 m_entry.setImageUrl(imageUrl);
                             }
-                        } else {
-                            qDebug() << "[DB Image] Entry doesn't have image URL";
                         }
                         
-                        // 원본 이미지 URL 확인
+                        // Process original image URL from AWS response
                         if (entryObj.contains("original_image_url")) {
                             QString originalUrl = entryObj["original_image_url"].toString();
-                            qDebug() << "[DB Image] Found original image URL:" << originalUrl;
-                            
                             if (!originalUrl.isEmpty()) {
                                 m_entry.setOriginalImageUrl(originalUrl);
                             }
                         }
                         
-                        // 원본 이미지 키 확인
+                        // Process original S3 key from AWS response
                         if (entryObj.contains("original_key")) {
                             m_originalS3Key = entryObj["original_key"].toString();
-                            qDebug() << "[DB Image] Found original S3 key:" << m_originalS3Key;
-                            
-                            // 원본 이미지 URL이 없는 경우 생성
                             if (m_entry.originalImageUrl().isEmpty()) {
                                 QString bucketUrl = "https://contact-photo-bucket-001.s3.amazonaws.com/";
                                 QString originalUrl = bucketUrl + m_originalS3Key;
                                 m_entry.setOriginalImageUrl(originalUrl);
-                                qDebug() << "[DB Image] Created original image URL from key:" << originalUrl;
-                            }
-                        } else {
-                            qDebug() << "[DB Image] Entry doesn't have original_key";
-                            // 만약 original_key가 없고 image URL이 있으면, 이를 original_key로 사용
-                            if (!m_currentImageUrl.isEmpty() && m_entry.originalImageUrl().isEmpty()) {
-                                // S3 URL에서 키 추출
-                                QStringList parts = m_currentImageUrl.split(".s3.amazonaws.com/");
-                                if (parts.size() > 1) {
-                                    m_originalS3Key = parts[1];
-                                    QString originalUrl = m_currentImageUrl;
-                                    m_entry.setOriginalImageUrl(originalUrl);
-                                    qDebug() << "[DB Image] Using image URL as original_key:" << m_originalS3Key;
-                                }
                             }
                         }
                         
-                        // 이미지 다운로드 및 표시
+                        // Download and display image
                         if (!m_currentImageUrl.isEmpty()) {
                             downloadImageFromS3(m_currentImageUrl);
                         }
@@ -242,11 +197,7 @@ void DetailPageWidget::fetchImageUrlFromDB()
                         break;
                     }
                 }
-            } else {
-                qDebug() << "[DB Image] No results found";
             }
-        } else {
-            qDebug() << "[DB Image] Response doesn't contain results array";
         }
     });
 }
@@ -255,7 +206,6 @@ void DetailPageWidget::fetchImageUrlFromDB()
 void DetailPageWidget::updateImageUI(const QString& imageUrl)
 {
     qDebug() << "[Image] Updating UI with image URL:" << imageUrl;
-    // 이 함수는 이미지 관련 UI만 업데이트
     m_currentImageUrl = imageUrl;
     ui->detailpageImage->setScaledContents(true);
 }
@@ -276,30 +226,27 @@ bool DetailPageWidget::eventFilter(QObject* watched, QEvent* event)
 
 void DetailPageWidget::onProfileImageClicked()
 {
-    // 추가 모드에서는 이미지 업로드 차단
+    // Handle image click in add mode
     if (m_isAddMode) {
         QMessageBox::information(this, tr("알림"), 
             tr("지금은 이미지를 업로드할 수 없습니다. 주소록에 추가한 후 사진을 업로드해주세요."));
         return;
     }
 
-    // 읽기 전용 모드에서는 원본 이미지 보기
+    // Handle image click in read-only mode
     if (ui->detailpageName->isReadOnly() && !m_isAddMode) {
         if (!m_entry.originalImageUrl().isEmpty()) {
-            qDebug() << "[Image] Showing original image from original URL:" << m_entry.originalImageUrl();
             showImageDialog(m_entry.originalImageUrl());
         }
         else if (!m_currentImageUrl.isEmpty()) {
-            qDebug() << "[Image] No original URL, using current image URL:" << m_currentImageUrl;
             showImageDialog(m_currentImageUrl);
         }
         else {
-            qDebug() << "[Image] No image available to show";
             QMessageBox::information(this, tr("이미지 없음"), 
                 tr("표시할 이미지가 없습니다. 편집 모드에서 이미지를 업로드해주세요."));
         }
     } 
-    // 편집 모드에서는 이미지 선택 다이얼로그
+    // Handle image selection in edit mode
     else {
         QString filePath = QFileDialog::getOpenFileName(this, 
             tr("프로필 이미지 선택"), 
@@ -307,9 +254,9 @@ void DetailPageWidget::onProfileImageClicked()
             tr("이미지 파일 (*.jpg *.jpeg *.png)"));
             
         if (!filePath.isEmpty()) {
-            qDebug() << "[Image] Selected file path:" << filePath;
             QFileInfo fileInfo(filePath);
             QString extension = fileInfo.suffix().toLower();
+            // Validate file extension
             if (extension != "jpg" && extension != "jpeg" && extension != "png") {
                 QMessageBox::warning(this, tr("파일 형식 오류"), 
                     tr("지원하지 않는 파일 형식입니다. JPG, JPEG, PNG 파일만 선택 가능합니다."));
@@ -324,12 +271,12 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
 {
     qDebug() << "[Image] Starting image upload process for:" << imagePath;
     
-    // 로딩 다이얼로그 표시
+    // Show loading dialog during upload
     LoadingDialog* loadingDialog = new LoadingDialog(this);
     loadingDialog->show();
     QCoreApplication::processEvents();
     
-    // 이미지 로드 및 크기 축소
+    // Load and process image
     QImage originalImage(imagePath);
     if (originalImage.isNull()) {
         qDebug() << "[Image] Failed to load image:" << imagePath;
@@ -339,58 +286,47 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
         return;
     }
     
-    // 이미지 크기 확인 및 축소
-    int maxWidth = 1024;  // 최대 너비
-    int maxHeight = 1024; // 최대 높이
+    // Resize image if needed
+    int maxWidth = 1024;
+    int maxHeight = 1024;
     QImage resizedImage = originalImage;
     
-    // 이미지가 최대 크기보다 크면 비율을 유지하면서 축소
     if (originalImage.width() > maxWidth || originalImage.height() > maxHeight) {
         resizedImage = originalImage.scaled(maxWidth, maxHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        qDebug() << "[Image] Resized image from" << originalImage.width() << "x" << originalImage.height() 
-                 << "to" << resizedImage.width() << "x" << resizedImage.height();
     }
     
-    // 이미지를 메모리 버퍼에 저장 (JPEG 형식, 품질 80%)
+    // Prepare image data for upload
     QByteArray fileData;
     QBuffer buffer(&fileData);
     buffer.open(QIODevice::WriteOnly);
     resizedImage.save(&buffer, "JPEG", 80);
     buffer.close();
     
-    qDebug() << "[Image] Compressed image size:" << fileData.size() << "bytes";
-    
-    // S3에 업로드할 임시 파일명 생성 (uploads/ 경로 사용)
+    // Generate S3 key for upload
     QString fileName = QString("uploads/%1_%2.jpg")
                       .arg(m_entry.phoneNumber().replace("-", ""))
                       .arg(QDateTime::currentDateTime().toString("yyyyMMddhhmmss"));
-    qDebug() << "[Image] Generated S3 key:" << fileName;
     
-    // Lambda 요청 준비
+    // Prepare AWS Lambda request
     QUrl lambdaUrl = getAwsImageResizeUrl();
-    qDebug() << "[Image] Lambda URL:" << lambdaUrl.toString();
     QNetworkRequest request(lambdaUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     
-    // Base64로 이미지 인코딩
     QByteArray base64Data = fileData.toBase64();
-    qDebug() << "[Image] Base64 encoded size:" << base64Data.size() << "bytes";
     
     QJsonObject jsonObj;
     jsonObj["key"] = fileName;
     jsonObj["phoneNumber"] = m_entry.phoneNumber();
     jsonObj["name"] = m_entry.name();
-    jsonObj["image_data"] = QString(base64Data); // 이미지 데이터 Base64 인코딩
+    jsonObj["image_data"] = QString(base64Data);
     
     QJsonDocument doc(jsonObj);
     QByteArray jsonData = doc.toJson();
-    qDebug() << "[Image] JSON payload size:" << jsonData.size() << "bytes";
     
-    // Lambda 함수 호출
+    // Send request to AWS
     QNetworkReply* reply = m_networkManager->post(request, jsonData);
-    qDebug() << "[Image] Network request sent";
     
-    // connect 블록 수정 - 로컬 변수를 레퍼런스로 접근하면 함수 종료 후 유효하지 않음
+    // Handle AWS response
     connect(reply, &QNetworkReply::finished, this, [this, reply, loadingDialog]() {
         loadingDialog->close();
         loadingDialog->deleteLater();
@@ -402,7 +338,6 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
 {
     qDebug() << "[Image] Received response from Lambda";
     
-    // 응답 파싱 전에 에러 체크
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "[Image] Network error:" << reply->errorString();
         QMessageBox::warning(this, tr("업로드 오류"), 
@@ -411,11 +346,8 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
         return;
     }
     
-    // 응답 파싱
     QByteArray responseData = reply->readAll();
-    reply->deleteLater(); // 여기서 일찍 deleteLater 호출
-    
-    qDebug() << "[Image] Raw response:" << responseData;
+    reply->deleteLater();
     
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
@@ -430,30 +362,27 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
     
     if (responseObj.contains("s3_url")) {
         QString imageUrl = responseObj["s3_url"].toString();
-        qDebug() << "[Image] Received S3 URL:" << imageUrl;
         m_currentImageUrl = imageUrl;
         
-        // 원본 이미지 키 저장
+        // Process original image key from AWS response
         if (responseObj.contains("original_key")) {
             m_originalS3Key = responseObj["original_key"].toString();
             QString originalUrl = "https://contact-photo-bucket-001.s3.amazonaws.com/" + m_originalS3Key;
             m_entry.setOriginalImageUrl(originalUrl);
-            qDebug() << "[Image] Original S3 key:" << m_originalS3Key;
         }
         
         try {
-            // 이미지 다운로드 및 표시
+            // Download and display image
             downloadImageFromS3(imageUrl);
             
-            // AddressEntry 업데이트
+            // Update AddressEntry
             m_entry.setImageUrl(imageUrl);
             
-            // DB에 즉시 업데이트하기 위한 코드 추가
+            // Update database
             LoadingDialog dialog(this);
             dialog.show();
-            QCoreApplication::processEvents(); // UI 업데이트 강제
+            QCoreApplication::processEvents();
             
-            // DB에 즉시 업데이트하기 위한 JSON 생성
             QJsonObject entryObj;
             entryObj["name"] = m_entry.name();
             entryObj["phoneNumber"] = m_entry.phoneNumber();
@@ -466,17 +395,13 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
             entryObj["image"] = imageUrl;
             entryObj["original_key"] = m_originalS3Key;
             
-            // 원본 이미지 URL 필드 추가 
             if (!m_entry.originalImageUrl().isEmpty()) {
                 entryObj["original_image_url"] = m_entry.originalImageUrl();
             }
             
-            // DB 업데이트 요청 보내기
             if (!saveToAWS(entryObj, getAwsSaveUrl())) {
                 dialog.close();
                 QMessageBox::warning(this, tr("DB 업데이트 오류"), tr("이미지 URL을 DB에 저장하는데 실패했습니다."));
-            } else {
-                qDebug() << "[Image] DB updated with new image URL";
             }
             
             dialog.close();
@@ -499,21 +424,19 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
         return;
     }
     
-    // 로딩 다이얼로그 표시
+    // Show loading dialog during download
     LoadingDialog* loadingDialog = new LoadingDialog(this);
     loadingDialog->show();
     QCoreApplication::processEvents();
     
-    // S3 URL에서 키 추출
+    // Extract S3 key from URL
     QString key = imageUrl.split(".s3.amazonaws.com/")[1];
-    qDebug() << "[Image] Extracted S3 key:" << key;
     
-    // Lambda 요청 준비
+    // Prepare AWS Lambda request
     QUrl lambdaUrl = getAwsImageResizeUrl();
     QNetworkRequest request(lambdaUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     
-    // 이미지 요청 JSON 생성
     QJsonObject jsonObj;
     jsonObj["action"] = "get_image";
     jsonObj["key"] = key;
@@ -521,10 +444,10 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
     QJsonDocument doc(jsonObj);
     QByteArray jsonData = doc.toJson();
     
-    // Lambda 함수 호출
+    // Send request to AWS
     QNetworkReply* reply = m_networkManager->post(request, jsonData);
     
-    // 연결 타임아웃 설정
+    // Set timeout for request
     QTimer* timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, [reply]() {
@@ -532,10 +455,10 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
             reply->abort();
         }
     });
-    timer->start(10000); // 10초 타임아웃
+    timer->start(10000);
     
+    // Handle AWS response
     connect(reply, &QNetworkReply::finished, this, [this, reply, timer, loadingDialog]() {
-        qDebug() << "[Image] Download completed";
         timer->stop();
         timer->deleteLater();
         loadingDialog->close();
@@ -563,11 +486,10 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
                 return;
             }
             
-            // 프로필 이미지 라벨에 표시
+            // Display image
             ui->detailpageImage->setStyleSheet("");
             ui->detailpageImage->setPixmap(pixmap);
             ui->detailpageImage->setScaledContents(true);
-            qDebug() << "[Image] Image displayed successfully";
         } else {
             qDebug() << "[Image] Response missing image_data";
         }
@@ -576,10 +498,9 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
 
 void DetailPageWidget::modeSetting(bool _AddMode)
 {
-    //추가 모드
+    // Add mode configuration
     if (_AddMode) {
         ui->detailpageTitle->setText("연락처 추가");
-        //편집모드 버튼 숨기기
         ui->detailpageCall->hide();
         ui->detailpagemailImage->hide();
         ui->detailpageMessage->hide();
@@ -596,14 +517,13 @@ void DetailPageWidget::modeSetting(bool _AddMode)
         ui->detailpageNickname->setStyleSheet(editStyle);
         ui->detailpageNotice->setStyleSheet(editStyle);
 
-        ui->infoVLayout->setContentsMargins(5, 0, 0, 0); // 왼쪽 마진
-        // 레이블 생성 및 LineEdit 재배치
+        ui->infoVLayout->setContentsMargins(5, 0, 0, 0);
+        
         QLabel* nameLabel = new QLabel("Name:", this);
         QLabel* phoneLabel = new QLabel("Phone:", this);
         QLabel* positionLabel = new QLabel("Position:", this);
         QLabel* nicknameLabel = new QLabel("Nickname:", this);
 
-        // QFormLayout 오른쪽 정렬
         ui->infoFormLayout->setLabelAlignment(Qt::AlignRight);
 
         ui->infoFormLayout->addRow(nameLabel, ui->detailpageName);
@@ -615,7 +535,7 @@ void DetailPageWidget::modeSetting(bool _AddMode)
         ui->detailpagePosition->setStyleSheet(editStyle);
         connect(ui->detailpageaddnewButton, &QPushButton::clicked, this, &DetailPageWidget::onSaveClicked);
     }
-    //일반 모드
+    // Normal mode configuration
     else
     {
         editInitialSettings();
@@ -623,6 +543,7 @@ void DetailPageWidget::modeSetting(bool _AddMode)
         ui->detailpageaddnewLabel->hide();
     }
 }
+
 void DetailPageWidget::populateFields() {
     ui->detailpageName->setText(m_entry.name());
     ui->detailpagePhone->setText(m_entry.phoneNumber());
@@ -632,7 +553,6 @@ void DetailPageWidget::populateFields() {
     ui->detailpageNickname->setText(m_entry.nickname());
     ui->detailpageNotice->setText(m_entry.memo());
     
-    // 이미지 URL이 있으면 이미지 다운로드 및 표시
     if (!m_entry.imageUrl().isEmpty()) {
         m_currentImageUrl = m_entry.imageUrl();
         downloadImageFromS3(m_currentImageUrl);
@@ -640,13 +560,13 @@ void DetailPageWidget::populateFields() {
 }
 
 void DetailPageWidget::onSaveClicked() {
-    // 필수 입력 검사
+    // Validate required fields
     if (ui->detailpageName->text().trimmed().isEmpty() || ui->detailpagePhone->text().trimmed().isEmpty()) {
         QMessageBox::warning(this, tr("입력 오류"), tr("이름과 전화번호는 반드시 입력되어야 합니다."));
         return;
     }
 
-    // 전화번호 양식 검증
+    // Validate phone number format
     QString phone = ui->detailpagePhone->text().trimmed();
     QRegularExpression regex("^\\d{3}-\\d{4}-\\d{4}$");
     QRegularExpressionMatch match = regex.match(phone);
@@ -655,11 +575,11 @@ void DetailPageWidget::onSaveClicked() {
         return;
     }
 
-    // 새 값 임시 저장
+    // Store new values
     QString newName = ui->detailpageName->text();
     QString newPhone = phone;
     
-    // 추가 모드에서 중복 체크 함수 호출
+    // Check for duplicates in add mode
     if (m_isAddMode && m_duplicateCheckFunc) {
         bool isDuplicate = m_duplicateCheckFunc(newName, newPhone);
         
@@ -670,23 +590,24 @@ void DetailPageWidget::onSaveClicked() {
         }
     }
     
+    // Check if name or phone number was modified
     bool isModified = (m_originalName != newName) || (m_originalPhoneNumber != newPhone);
 
-    // ---------- 다이얼로그 띄우기 ----------
+    // Show loading dialog during save
     LoadingDialog dialog(this);
     dialog.show();
-    QCoreApplication::processEvents();  // UI 업데이트 강제
+    QCoreApplication::processEvents();
 
-    // 기존 항목 삭제 요청 (수정된 경우에만, 추가 모드가 아닐 때만)
+    // Delete existing entry if modified (not in add mode)
     if (isModified && !m_isAddMode) {
         if (!deleteAddressEntryFromAWS(m_entry, getAwsSaveUrl())) {
-            dialog.close();  // 닫기 꼭 해야 함!
+            dialog.close();
             QMessageBox::warning(this, tr("삭제 오류"), tr("이전 튜플 삭제에 실패했습니다."));
             return;
         }
     }
 
-    // 업데이트
+    // Update entry data
     m_entry.setName(newName);
     m_entry.setPhoneNumber(newPhone);
     m_entry.setEmail(ui->detailpageMail->text());
@@ -695,23 +616,25 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setNickname(ui->detailpageNickname->text());
     m_entry.setMemo(ui->detailpageNotice->text());
     
-    // 이미지 URL 저장 (프로필 이미지가 변경된 경우)
+    // Update image URL if changed
     if (!m_currentImageUrl.isEmpty()) {
         m_entry.setImageUrl(m_currentImageUrl);
     }
 
+    // Update original values if modified
     if (isModified) {
         setOriginalName(newName);
         setOriginalPhoneNumber(newPhone);
     }
 
-    dialog.close();  // 통신 종료 후 닫기
+    dialog.close();
 
     m_saved = true;
     emit entryUpdated(m_entry);
     emit detailPageClosed();
     this->close();
 }
+
 void DetailPageWidget::editInitialSettings()
 {
         ui->detailpageName->setReadOnly(true);
@@ -721,14 +644,14 @@ void DetailPageWidget::editInitialSettings()
         ui->detailpagePosition->setReadOnly(true);
         ui->detailpageNickname->setReadOnly(true);
         ui->detailpageNotice->setReadOnly(true);
-};
+}
 
 void DetailPageWidget::onEditButtonClicked()
 {
     bool isReadOnly = ui->detailpageName->isReadOnly();
     QString editStyle = "QLineEdit { background: white; }";
 
-    // 편집 모드: 흰색, 읽기 전용: 원래 스타일 복원
+    // Toggle edit mode for all fields
     ui->detailpageName->setReadOnly(!isReadOnly);
     ui->detailpageName->setStyleSheet(isReadOnly ? editStyle : origNameStyle);
 
@@ -755,34 +678,26 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
 {
     qDebug() << "[Image] Showing image dialog for URL:" << imageUrl;
     
-    // 이미지 URL에서 S3 키 추출
+    // Extract S3 key from URL
     QString s3Key;
     if (imageUrl.contains(".s3.amazonaws.com/")) {
         s3Key = imageUrl.split(".s3.amazonaws.com/")[1];
-        qDebug() << "[Image] Extracted S3 key from URL:" << s3Key;
     } else {
         qDebug() << "[Image] Invalid image URL format";
         QMessageBox::warning(this, tr("이미지 오류"), tr("잘못된 이미지 URL 형식입니다."));
         return;
     }
     
-    // URL이 원본 이미지 URL과 일치하는지 확인
+    // Check if image is original
     bool isOriginalImage = false;
-    
-    // 1. 전달된 URL이 원본 이미지 URL과 일치하는지 확인
     if (!m_entry.originalImageUrl().isEmpty() && imageUrl == m_entry.originalImageUrl()) {
         isOriginalImage = true;
-        qDebug() << "[Image] URL matches original image URL";
     }
-    // 2. 기존 m_originalS3Key 체크 방식 (호환성 유지)
     else if (!m_originalS3Key.isEmpty() && imageUrl.endsWith(m_originalS3Key)) {
         isOriginalImage = true;
-        qDebug() << "[Image] URL ends with original S3 key";
     }
     
-    qDebug() << "[Image] Is original image:" << isOriginalImage;
-    
-    // 이미지 다운로드 요청
+    // Prepare AWS Lambda request
     QUrl lambdaUrl = getAwsImageResizeUrl();
     QNetworkRequest request(lambdaUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -791,26 +706,25 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
     jsonObj["action"] = "get_image";
     jsonObj["key"] = s3Key;
     
-    // 원본 이미지인 경우 크기 조정 없이 원본 그대로 표시할 것임을 알림
     if (isOriginalImage) {
         jsonObj["original"] = true;
-        qDebug() << "[Image] Requesting original image without resizing";
     }
     
     QJsonDocument doc(jsonObj);
     QByteArray jsonData = doc.toJson();
     
-    // 로딩 다이얼로그 표시 - 포인터로 생성
+    // Show loading dialog during download
     LoadingDialog* loadingDialog = new LoadingDialog(this);
     loadingDialog->show();
     QCoreApplication::processEvents();
     
+    // Send request to AWS
     QNetworkReply* reply = m_networkManager->post(request, jsonData);
     
-    // 값으로 캡처하여 로컬 변수 참조 문제 해결
+    // Handle AWS response
     connect(reply, &QNetworkReply::finished, this, [this, reply, loadingDialog, isOriginalImage]() {
         loadingDialog->close();
-        loadingDialog->deleteLater(); // 메모리 누수 방지
+        loadingDialog->deleteLater();
         
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "[Image] Error downloading image:" << reply->errorString();
@@ -837,7 +751,7 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
                 return;
             }
             
-            // 이미지 뷰어 다이얼로그 생성
+            // Create and show image dialog
             QDialog* imageDialog = new QDialog(this);
             imageDialog->setWindowTitle(isOriginalImage ? 
                                        tr("원본 프로필 이미지") : 
@@ -849,11 +763,10 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
             imageLabel->setPixmap(pixmap);
             imageLabel->setScaledContents(true);
             
-            // 화면 크기 가져오기
+            // Set dialog size based on screen size
             QScreen* screen = QGuiApplication::primaryScreen();
             QRect screenGeometry = screen->geometry();
             
-            // 다이얼로그 크기 설정 (이미지 크기에 맞춤)
             int maxWidth = screenGeometry.width() * 0.8;
             int maxHeight = screenGeometry.height() * 0.8;
             
@@ -866,7 +779,6 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
             layout->addWidget(imageLabel);
             imageDialog->setLayout(layout);
             
-            // 다이얼로그를 모달로 표시
             imageDialog->exec();
         } else {
             qDebug() << "[Image] Response missing image_data";
@@ -878,16 +790,16 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
 //창 닫기
 void DetailPageWidget::closeWindow()
 {
-    // 변경사항 감지
+    // Check for unsaved changes
     bool isModified = false;
     
-    // 원본 이름, 전화번호와 현재 값 비교
+    // Check name and phone number changes
     if (m_originalName != ui->detailpageName->text() || 
         m_originalPhoneNumber != ui->detailpagePhone->text()) {
         isModified = true;
     }
     
-    // 이메일, 회사, 직책, 별명, 메모 등 변경 확인
+    // Check other field changes
     if (m_entry.email() != ui->detailpageMail->text() ||
         m_entry.company() != ui->detailpageCompany->text() ||
         m_entry.position() != ui->detailpagePosition->text() ||
@@ -896,12 +808,12 @@ void DetailPageWidget::closeWindow()
         isModified = true;
     }
     
-    // 이미지 URL 변경 확인
+    // Check image URL changes
     if (!m_currentImageUrl.isEmpty() && m_currentImageUrl != m_entry.imageUrl()) {
         isModified = true;
     }
     
-    // 변경사항이 있으면 경고 메시지 표시
+    // Show warning if there are unsaved changes
     if (isModified && !m_saved) {
         QMessageBox::StandardButton reply = QMessageBox::warning(this, 
             tr("변경사항 저장 안됨"), 
@@ -909,7 +821,7 @@ void DetailPageWidget::closeWindow()
             QMessageBox::Yes | QMessageBox::No);
             
         if (reply == QMessageBox::No) {
-            return; // 저장하지 않고 닫기 취소
+            return;
         }
     }
     
@@ -921,18 +833,14 @@ AddressEntry DetailPageWidget::updatedEntry() const {
 }
 
 void DetailPageWidget::closeEvent(QCloseEvent* event) {
-    // 변경사항이 있고 저장되지 않았다면
     if (!m_saved) {
-        // 변경사항 감지 (closeWindow와 동일한 로직)
         bool isModified = false;
         
-        // 원본 이름, 전화번호와 현재 값 비교
         if (m_originalName != ui->detailpageName->text() || 
             m_originalPhoneNumber != ui->detailpagePhone->text()) {
             isModified = true;
         }
         
-        // 이메일, 회사, 직책, 별명, 메모 등 변경 확인
         if (m_entry.email() != ui->detailpageMail->text() ||
             m_entry.company() != ui->detailpageCompany->text() ||
             m_entry.position() != ui->detailpagePosition->text() ||
@@ -941,12 +849,10 @@ void DetailPageWidget::closeEvent(QCloseEvent* event) {
             isModified = true;
         }
         
-        // 이미지 URL 변경 확인
         if (!m_currentImageUrl.isEmpty() && m_currentImageUrl != m_entry.imageUrl()) {
             isModified = true;
         }
         
-        // 실제로 변경된 사항이 있을 때만 경고 메시지 표시
         if (isModified) {
             QMessageBox::StandardButton reply = QMessageBox::warning(this, 
                 tr("변경사항 저장 안됨"), 
@@ -954,7 +860,7 @@ void DetailPageWidget::closeEvent(QCloseEvent* event) {
                 QMessageBox::Yes | QMessageBox::No);
                 
             if (reply == QMessageBox::No) {
-                event->ignore(); // 닫기 취소
+                event->ignore();
                 return;
             }
         }
