@@ -11,7 +11,8 @@ public:
                  const QString& position,
                  const QString& nickname,
                  bool favorite = false,
-                 const QString& memo = QString())
+                 const QString& memo = QString(),
+                 const QString& imageUrl = QString())
         : m_name(name),
         m_phoneNumber(phoneNumber),
         m_email(email),
@@ -19,7 +20,8 @@ public:
         m_position(position),
         m_nickname(nickname),
         m_favorite(favorite),
-        m_memo(memo)
+        m_memo(memo),
+        m_imageUrl(imageUrl)
     {}
     // Getters
     QString name() const { return m_name; }
@@ -30,6 +32,7 @@ public:
     QString nickname() const { return m_nickname; }
     bool favorite() const { return m_favorite; }
     QString memo() const { return m_memo; }
+    QString imageUrl() const { return m_imageUrl; }
     // Setters
     void setName(const QString& name) { m_name = name; }
     void setPhoneNumber(const QString& phoneNumber) { m_phoneNumber = phoneNumber; }
@@ -39,6 +42,7 @@ public:
     void setNickname(const QString& nickname) { m_nickname = nickname; }
     void setFavorite(bool favorite) { m_favorite = favorite; }
     void setMemo(const QString & memo) { m_memo = memo; }
+    void setImageUrl(const QString& imageUrl) { m_imageUrl = imageUrl; }
 private:
     QString m_name;
     QString m_phoneNumber;
@@ -48,5 +52,6 @@ private:
     QString m_nickname;
     bool m_favorite = false;
     QString m_memo;
+    QString m_imageUrl;
 };
 #endif // ADDRESSENTRY_H

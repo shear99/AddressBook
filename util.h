@@ -22,6 +22,9 @@ inline QUrl getAwsLoadUrl() {
 inline QUrl getAwsSaveUrl() {
     return QUrl(QString::fromUtf8(qgetenv("AWS_LAMBDA_SAVE_URL")));
 }
+inline QUrl getAwsImageResizeUrl() {
+    return QUrl(QString::fromUtf8(qgetenv("AWS_LAMBDA_RESIZE_URL")));
+}
 // lamdba에 delete키를 추가하여 DB에 삭제 요청
 inline bool deleteAddressEntryFromAWS(const AddressEntry& entry, const QUrl& url) {
     QJsonObject deleteObj;

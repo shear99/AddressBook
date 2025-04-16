@@ -31,12 +31,10 @@ set(PROJECT_SOURCES
     fontupdate.h
     fontupdate.cpp
     ImageEntry.h
-    ImageEntry.cpp
     heartdelegate.h
     heartdelegate.cpp
     loadingdialog.h
     multicolumnfilterproxymodel.h
-    multicolumnfilterproxymodel.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
