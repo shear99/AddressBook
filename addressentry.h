@@ -33,6 +33,7 @@ public:
     bool favorite() const { return m_favorite; }
     QString memo() const { return m_memo; }
     QString imageUrl() const { return m_imageUrl; }
+    QString originalImageUrl() const { return m_originalImageUrl; }
     // Setters
     void setName(const QString& name) { m_name = name; }
     void setPhoneNumber(const QString& phoneNumber) { m_phoneNumber = phoneNumber; }
@@ -42,7 +43,8 @@ public:
     void setNickname(const QString& nickname) { m_nickname = nickname; }
     void setFavorite(bool favorite) { m_favorite = favorite; }
     void setMemo(const QString & memo) { m_memo = memo; }
-    void setImageUrl(const QString& imageUrl) { m_imageUrl = imageUrl; }
+    void setImageUrl(const QString& url) { m_imageUrl = url; }
+    void setOriginalImageUrl(const QString& url) { m_originalImageUrl = url; }
 private:
     QString m_name;
     QString m_phoneNumber;
@@ -53,5 +55,6 @@ private:
     bool m_favorite = false;
     QString m_memo;
     QString m_imageUrl;
+    QString m_originalImageUrl;
 };
 #endif // ADDRESSENTRY_H

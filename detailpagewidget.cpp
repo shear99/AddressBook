@@ -183,27 +183,42 @@ void DetailPageWidget::fetchImageUrlFromDB()
                         
                         qDebug() << "[DB Image] Found matching entry at index:" << i;
                         
+                        // 이미지 URL 확인
                         if (entryObj.contains("image")) {
                             QString imageUrl = entryObj["image"].toString();
                             qDebug() << "[DB Image] Found image URL:" << imageUrl;
                             
-                            // 원본 이미지 키 저장
-                            if (entryObj.contains("original_key")) {
-                                m_originalS3Key = entryObj["original_key"].toString();
-                                qDebug() << "[DB Image] Original S3 key:" << m_originalS3Key;
-                            }
-                            
-                            // 이미지 URL 저장 및 다운로드
+                            // 이미지 URL 저장
                             if (!imageUrl.isEmpty()) {
                                 m_currentImageUrl = imageUrl;
                                 m_entry.setImageUrl(imageUrl);
-                                
-                                // 이미지 다운로드 및 표시
-                                downloadImageFromS3(imageUrl);
                             }
                         } else {
                             qDebug() << "[DB Image] Entry doesn't have image URL";
                         }
+                        
+                        // 원본 이미지 키 확인
+                        if (entryObj.contains("original_key")) {
+                            m_originalS3Key = entryObj["original_key"].toString();
+                            qDebug() << "[DB Image] Found original S3 key:" << m_originalS3Key;
+                        } else {
+                            qDebug() << "[DB Image] Entry doesn't have original_key";
+                            // 만약 original_key가 없고 image URL이 있으면, 이를 original_key로 사용
+                            if (!m_currentImageUrl.isEmpty()) {
+                                // S3 URL에서 키 추출
+                                QStringList parts = m_currentImageUrl.split(".s3.amazonaws.com/");
+                                if (parts.size() > 1) {
+                                    m_originalS3Key = parts[1];
+                                    qDebug() << "[DB Image] Using image URL as original_key:" << m_originalS3Key;
+                                }
+                            }
+                        }
+                        
+                        // 이미지 다운로드 및 표시
+                        if (!m_currentImageUrl.isEmpty()) {
+                            downloadImageFromS3(m_currentImageUrl);
+                        }
+                        
                         break;
                     }
                 }
@@ -250,14 +265,18 @@ void DetailPageWidget::onProfileImageClicked()
 
     // 읽기 전용 모드에서는 원본 이미지 보기
     if (ui->detailpageName->isReadOnly() && !m_isAddMode) {
-        if (!m_originalS3Key.isEmpty()) {
-            QString originalUrl = QString("https://contact-photo-bucket-001.s3.amazonaws.com/%1")
-                               .arg(m_originalS3Key);
-            qDebug() << "[Image] Showing original image:" << originalUrl;
-            showImageDialog(originalUrl);
+        if (!m_entry.originalImageUrl().isEmpty()) {
+            qDebug() << "[Image] Showing original image from original URL:" << m_entry.originalImageUrl();
+            showImageDialog(m_entry.originalImageUrl());
+        }
+        else if (!m_currentImageUrl.isEmpty()) {
+            qDebug() << "[Image] No original URL, using current image URL:" << m_currentImageUrl;
+            showImageDialog(m_currentImageUrl);
         }
         else {
-            qDebug() << "[Image] No original S3 key available";
+            qDebug() << "[Image] No image available to show";
+            QMessageBox::information(this, tr("이미지 없음"), 
+                tr("표시할 이미지가 없습니다. 편집 모드에서 이미지를 업로드해주세요."));
         }
     } 
     // 편집 모드에서는 이미지 선택 다이얼로그
@@ -397,6 +416,8 @@ void DetailPageWidget::onImageUploadFinished(QNetworkReply* reply)
         // 원본 이미지 키 저장
         if (responseObj.contains("original_key")) {
             m_originalS3Key = responseObj["original_key"].toString();
+            QString originalUrl = "https://contact-photo-bucket-001.s3.amazonaws.com/" + m_originalS3Key;
+            m_entry.setOriginalImageUrl(originalUrl);
             qDebug() << "[Image] Original S3 key:" << m_originalS3Key;
         }
         
@@ -709,6 +730,21 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
 {
     qDebug() << "[Image] Showing image dialog for URL:" << imageUrl;
     
+    // 이미지 URL에서 S3 키 추출
+    QString s3Key;
+    if (imageUrl.contains(".s3.amazonaws.com/")) {
+        s3Key = imageUrl.split(".s3.amazonaws.com/")[1];
+        qDebug() << "[Image] Extracted S3 key from URL:" << s3Key;
+    } else {
+        qDebug() << "[Image] Invalid image URL format";
+        QMessageBox::warning(this, tr("이미지 오류"), tr("잘못된 이미지 URL 형식입니다."));
+        return;
+    }
+    
+    // URL이 원본 이미지 키와 일치하는지 확인
+    bool isOriginalImage = (!m_originalS3Key.isEmpty() && imageUrl.endsWith(m_originalS3Key));
+    qDebug() << "[Image] Is original image:" << isOriginalImage;
+    
     // 이미지 다운로드 요청
     QUrl lambdaUrl = getAwsImageResizeUrl();
     QNetworkRequest request(lambdaUrl);
@@ -716,7 +752,12 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
     
     QJsonObject jsonObj;
     jsonObj["action"] = "get_image";
-    jsonObj["key"] = imageUrl.split(".s3.amazonaws.com/")[1];
+    jsonObj["key"] = s3Key;
+    
+    // 원본 이미지인 경우 크기 조정 없이 원본 그대로 표시할 것임을 알림
+    if (isOriginalImage) {
+        jsonObj["original"] = true;
+    }
     
     QJsonDocument doc(jsonObj);
     QByteArray jsonData = doc.toJson();
@@ -729,7 +770,7 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
     QNetworkReply* reply = m_networkManager->post(request, jsonData);
     
     // 값으로 캡처하여 로컬 변수 참조 문제 해결
-    connect(reply, &QNetworkReply::finished, this, [this, reply, loadingDialog]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, loadingDialog, isOriginalImage]() {
         loadingDialog->close();
         loadingDialog->deleteLater(); // 메모리 누수 방지
         
@@ -760,7 +801,9 @@ void DetailPageWidget::showImageDialog(const QString& imageUrl)
             
             // 이미지 뷰어 다이얼로그 생성
             QDialog* imageDialog = new QDialog(this);
-            imageDialog->setWindowTitle(tr("프로필 이미지"));
+            imageDialog->setWindowTitle(isOriginalImage ? 
+                                       tr("원본 프로필 이미지") : 
+                                       tr("프로필 이미지"));
             imageDialog->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
             
             QVBoxLayout* layout = new QVBoxLayout(imageDialog);
