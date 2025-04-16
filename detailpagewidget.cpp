@@ -213,8 +213,8 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
     qDebug() << "[Image] Starting image upload process for:" << imagePath;
     
     // 로딩 다이얼로그 표시
-    LoadingDialog dialog(this);
-    dialog.show();
+    LoadingDialog* loadingDialog = new LoadingDialog(this);
+    loadingDialog->show();
     QCoreApplication::processEvents();
     
     // 파일 읽기
@@ -222,7 +222,8 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "[Image] Failed to open file:" << file.errorString();
         QMessageBox::warning(this, tr("파일 오류"), tr("이미지 파일을 열 수 없습니다."));
-        dialog.close();
+        loadingDialog->close();
+        loadingDialog->deleteLater();
         return;
     }
     
@@ -262,12 +263,9 @@ void DetailPageWidget::uploadImageToLambda(const QString& imagePath)
     qDebug() << "[Image] Network request sent";
     
     // connect 블록 수정 - 로컬 변수를 레퍼런스로 접근하면 함수 종료 후 유효하지 않음
-    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-        // 다이얼로그는 멤버 변수가 아니므로 직접 참조하지 않음
-        LoadingDialog* dialogPtr = qobject_cast<LoadingDialog*>(sender()->parent());
-        if (dialogPtr) {
-            dialogPtr->close();
-        }
+    connect(reply, &QNetworkReply::finished, this, [this, reply, loadingDialog]() {
+        loadingDialog->close();
+        loadingDialog->deleteLater();
         onImageUploadFinished(reply);
     });
 }
@@ -338,6 +336,11 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
         return;
     }
     
+    // 로딩 다이얼로그 표시
+    LoadingDialog* loadingDialog = new LoadingDialog(this);
+    loadingDialog->show();
+    QCoreApplication::processEvents();
+    
     // S3 URL에서 키 추출
     QString key = imageUrl.split(".s3.amazonaws.com/")[1];
     qDebug() << "[Image] Extracted S3 key:" << key;
@@ -368,10 +371,12 @@ void DetailPageWidget::downloadImageFromS3(const QString& imageUrl)
     });
     timer->start(10000); // 10초 타임아웃
     
-    connect(reply, &QNetworkReply::finished, this, [this, reply, timer]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, timer, loadingDialog]() {
         qDebug() << "[Image] Download completed";
         timer->stop();
         timer->deleteLater();
+        loadingDialog->close();
+        loadingDialog->deleteLater();
         
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "[Image] Download error:" << reply->errorString();
