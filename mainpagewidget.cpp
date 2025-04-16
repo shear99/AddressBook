@@ -15,73 +15,70 @@ MainPageWidget::MainPageWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // setToolTip
     ui->addButton->setToolTip("Add new");
     ui->deleteButton->setToolTip("Delete");
 
-    // 1. 모델 및 프록시 모델 생성
+    // Initialize model and proxy model
     model = new AddressBookModel(this);
     proxyModel = new MultiColumnFilterProxyModel(this);
     proxyModel->setSourceModel(model);
     
-    // 정렬 가능하도록 설정
+    // Enable sorting
     proxyModel->setSortRole(Qt::DisplayRole);
     proxyModel->setDynamicSortFilter(true);
-
-    // 2. 테이블뷰에 프록시 모델 연결
     ui->addressTableView->setModel(proxyModel);
     
-    // 정렬 기능 활성화
+    // Enable sorting in table view
     ui->addressTableView->setSortingEnabled(true);
     
-    // 초기 정렬 설정 (이름 기준 오름차순)
-    ui->addressTableView->sortByColumn(1, Qt::AscendingOrder); // 1은 name 컬럼
+    // Default sort by name (ascending)
+    ui->addressTableView->sortByColumn(1, Qt::AscendingOrder);
 
-    // 3. 검색창 연결
+    // Connect search field
     connect(ui->searchText, &QLineEdit::textChanged, this, [=](const QString &text) {
         proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
     });
 
-    // 4. 폰트 적용
+    // Apply custom fonts
     FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
 
-    // 5. 첫 번째 열(즐겨찾기)에는 커스텀 하트 delegate 적용
+    // Apply heart delegate to favorite column
     HeartDelegate* heartDelegate = new HeartDelegate(this);
     ui->addressTableView->setItemDelegateForColumn(0, heartDelegate);
 
-    // 6. 첫 번째 열 너비를 줄임 (예: 24 픽셀)
+    // Reduce width of favorite column
     ui->addressTableView->setColumnWidth(0, 24);
 
-    // 7. 단일 클릭 시 편집(체크박스 토글) 허용
+    // Allow editing with single click (for checkbox toggle)
     ui->addressTableView->setEditTriggers(QAbstractItemView::SelectedClicked);
 
-    // 8. 테이블뷰 기본 설정
+    // Configure table view
     ui->addressTableView->horizontalHeader()->setStretchLastSection(true);
     ui->addressTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->addressTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->addressTableView->setSelectionMode(QAbstractItemView::SingleSelection);
     
-    // 정렬 가능한 컬럼 설정 (name, phone, email, company, position만 정렬 가능)
+    // Configure sortable columns
     QHeaderView* header = ui->addressTableView->horizontalHeader();
     header->setSectionsClickable(true);
     
-    // 첫 번째 열(즐겨찾기) 정렬 비활성화
+    // Configure favorite column as fixed size
     header->setSectionResizeMode(0, QHeaderView::Fixed);
     
-    // 각 컬럼의 정렬 설정
+    // Set sorting per column
     for (int i = 0; i < ui->addressTableView->model()->columnCount(); ++i) {
         if (i >= 1 && i <= 5) { 
-            // 1:name, 2:phone, 3:email, 4:company, 5:position은 정렬 가능
+            // Allow sorting for name, phone, email, company, position
             header->setSortIndicatorShown(true);
         } else {
-            // 다른 컬럼은 정렬 불가
-            if (i != 0) { // 즐겨찾기 열은 위에서 이미 설정함
+            // Disable sorting for other columns
+            if (i != 0) { // Favorite column already configured above
                 header->setSectionResizeMode(i, QHeaderView::Interactive);
             }
         }
     }
 
-    // 9. 더블클릭 시 상세 편집 페이지로 이동
+    // Open detail page on double-click
     connect(ui->addressTableView, &QTableView::doubleClicked, this, [=](const QModelIndex &proxyIndex) {
         if (!proxyIndex.isValid() || proxyIndex.column() == 0)
             return;
@@ -90,7 +87,7 @@ MainPageWidget::MainPageWidget(QWidget *parent)
         AddressEntry entry = model->getEntry(row);
         DetailPageWidget* detailPage = new DetailPageWidget(entry, nullptr, false, nullptr);
         
-        // 메인 페이지 숨기는 대신 비활성화
+        // Disable main page instead of hiding
         this->setEnabled(false);
         detailPage->show();
 
@@ -98,18 +95,18 @@ MainPageWidget::MainPageWidget(QWidget *parent)
             model->updateEntry(row, updatedEntry);
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
-            // 메인 페이지 다시 활성화
+            // Re-enable main page
             this->setEnabled(true);
             detailPage->deleteLater();
         });
     });
 
-    // 10. addButton 클릭 시 빈 DetailPageWidget을 열어서 새 항목 추가
+    // Handle add button click
     connect(ui->addButton, &QPushButton::clicked, this, [=]() {
         AddressEntry newEntry;
         DetailPageWidget* detailPage = new DetailPageWidget(newEntry, nullptr, true, model);
         
-        // 메인 페이지 숨기는 대신 비활성화
+        // Disable main page instead of hiding
         this->setEnabled(false);
         detailPage->show();
         
@@ -117,26 +114,26 @@ MainPageWidget::MainPageWidget(QWidget *parent)
             model->addEntry(updatedEntry);
         });
         connect(detailPage, &DetailPageWidget::detailPageClosed, this, [=]() {
-            // 메인 페이지 다시 활성화
+            // Re-enable main page
             this->setEnabled(true);
             detailPage->deleteLater();
         });
     });
 
-    // 11. deleteButton 클릭 시, 현재 선택된 항목 삭제 (삭제 확인 다이얼로그 포함)
+    // Handle delete button click
     connect(ui->deleteButton, &QPushButton::clicked, this, [=]() {
         QItemSelectionModel* selectionModel = ui->addressTableView->selectionModel();
         QModelIndexList selectedRows = selectionModel->selectedRows();
         if (selectedRows.isEmpty()) {
-            QMessageBox::information(this, tr("삭제"), tr("삭제할 항목을 선택하세요."));
+            QMessageBox::information(this, tr("Delete"), tr("Select an item to delete."));
             return;
         }
         int proxyRow = selectedRows.first().row();
         QModelIndex sourceIndex = proxyModel->mapToSource(proxyModel->index(proxyRow, 0));
         int row = sourceIndex.row();
         QMessageBox::StandardButton reply = QMessageBox::question(this,
-                                                                  tr("삭제 확인"),
-                                                                  tr("삭제하시겠습니까?"),
+                                                                  tr("Confirm Delete"),
+                                                                  tr("Are you sure you want to delete?"),
                                                                   QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
             model->removeEntry(row);

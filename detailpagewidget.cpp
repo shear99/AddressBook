@@ -623,7 +623,7 @@ void DetailPageWidget::onSaveClicked() {
     m_entry.setPosition(ui->detailpagePosition->text());
     m_entry.setNickname(ui->detailpageNickname->text());
     m_entry.setMemo(ui->detailpageNotice->text());
-    
+
     // Update image URL if changed
     if (!m_currentImageUrl.isEmpty()) {
         m_entry.setImageUrl(m_currentImageUrl);
