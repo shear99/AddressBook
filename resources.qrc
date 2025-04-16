@@ -29,4 +29,7 @@
         <file>mainpageImage/search_30dp_000000.png</file>
         <file>mainpageImage/search_30dp_999999.png</file>
     </qresource>
+    <qresource prefix="/mainIcon">
+        <file>mainIcon/address-book.png</file>
+    </qresource>
 </RCC>
