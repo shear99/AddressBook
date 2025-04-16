@@ -35,19 +35,25 @@ Qt 프레임워크(C++) 기반의 클라이언트와 서버리스 백엔드가 �
 ## 실행 방법
 
 1. **환경 준비**
-   - Qt Creator 5.x 이상 설치
-   - AWS Lambda 및 DynamoDB, API Gateway 구성
-   - `.env` 파일에 Lambda 엔드포인트 설정
+   - Qt Creator에서 프로젝트를 열고 CMake를 실행하여 빌드 폴더 생성
+   - 빌드 폴더 내에 `.env` 파일 생성
      ```
-     AWS_LAMBDA_LOAD_URL="your-api-gateway-load-url"
-     AWS_LAMBDA_SAVE_URL="your-api-gateway-save-url"
+     AWS_LAMBDA_LOAD_URL="your-AddressBookOutputLambda-url"
+     AWS_LAMBDA_SAVE_URL="your-AddressBookInputLambda-url"
+     AWS_LAMBDA_RESIZE_URL="your-resize_center_crop_s3-url"
      ```
+   - `.env` 파일 위치:
+     - Release 모드: `build/Qt${QT_VERSION_MAJOR}/Release/.env`
+     - Debug 모드: `build/Qt${QT_VERSION_MAJOR}/Debug/.env`
 
 2. **빌드 및 실행**
-   ```bash
-   qmake && make -j4
-   ./addressbook
-   ```
+   - Qt Creator에서 프로젝트 열기
+   - CMake 실행 (빌드 폴더 생성)
+   - 빌드 설정:
+     - Release/Debug 모드 선택
+     - 빌드 디렉토리 확인
+   - 빌드 실행 (Ctrl+B 또는 Build 메뉴)
+   - 실행 (Ctrl+R 또는 Run 메뉴)
 
 3. **데이터 유효성**
    - 이름, 전화번호는 필수 입력
