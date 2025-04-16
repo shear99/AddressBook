@@ -6,6 +6,20 @@ Qt 프레임워크(C++) 기반의 클라이언트와 서버리스 백엔드가 �
 사용자는 연락처(이름, 전화번호, 이메일, 회사, 직책, 별명, 이미지 등)를 추가, 삭제, 편집할 수 있습니다.  
 즐겨찾기, 다중 컬럼 검색, 상세 정보 편집, 네트워크 오류 알림 등 다양한 편의 기능을 제공합니다.
 
+## 스크린샷
+
+### 메인 페이지 - 주소록 목록 및 검색
+![메인 페이지 화면](asset/Slide1.png)
+*메인 페이지에서는 연락처 목록 조회, 검색, 추가, 삭제 및 즐겨찾기 기능을 제공합니다.*
+
+### 세부 페이지 - 연락처 정보 편집
+![세부 페이지 화면](asset/Slide2.png)
+*세부 페이지에서는 연락처의 모든 정보를 확인하고 편집할 수 있습니다.*
+
+### 원본 이미지 보기
+![원본 이미지 보기](asset/Slide3.png)
+*읽기 모드에서 프로필 이미지 클릭 시 원본 이미지를 확인할 수 있습니다.*
+
 ---
 
 ## Summary
@@ -84,9 +98,25 @@ Qt 프레임워크(C++) 기반의 클라이언트와 서버리스 백엔드가 �
 
 ## 트러블슈팅 가이드
 
-- **데이터 동기화 실패**: `.env` 파일 경로 및 Lambda URL 확인
-- **테이블 뷰 렌더링 문제**: 모델 리셋 필요 시 `ui->addressTableView->reset();` 호출
-- **즐겨찾기 상태 불일치**: `emit dataChanged(index, index);`로 뷰 갱신
+### 데이터 동기화 실패
+- `.env` 파일이 올바른 위치에 있는지 확인 (앱 실행 파일과 동일 디렉토리)
+- `.env` 파일의 Lambda URL이 올바른지 확인 (오타, 지역, 스테이지 등)
+- 네트워크 연결 상태 확인 (VPN, 방화벽 등이 API Gateway 접근을 차단하는지)
+- AWS Lambda 콘솔에서 함수 실행 권한 및 로그 확인
+
+### Lambda 오류
+- **Access Denied 오류**: IAM 역할에 DynamoDB 및 S3 접근 권한 확인
+- **Timeout 오류**: Lambda 함수 제한 시간 확인 (기본 3초)
+- **초기 지연**: Cold Start 현상으로 첫 호출 시 5초까지 지연 가능, 재시도 필요
+
+### UI 관련 문제
+- **테이블 뷰 갱신 안됨**: `ui->addressTableView->reset();` 호출 또는 애플리케이션 재시작
+- **즐겨찾기 상태 불일치**: 해당 항목의 인덱스로 `emit dataChanged(index, index);` 호출
+- **이미지 로드 실패**: 네트워크 연결 확인 및 이미지 URL이 유효한지 검사
+
+### 빌드 오류
+- **Qt 모듈 누락**: `QT += network widgets` 등 필요한 모듈이 .pro 파일에 포함되었는지 확인
+- **의존성 오류**: AWS SDK 등 외부 라이브러리가 필요한 경우 설치 확인
 
 ---
 
@@ -94,5 +124,58 @@ Qt 프레임워크(C++) 기반의 클라이언트와 서버리스 백엔드가 �
 
 - **권병수**: 서버와 클라이언트 간 데이터 동기화, AWS Lambda 및 DynamoDB 연동, 데이터 불러오기/저장/삭제 로직 담당
 - **김도현**: UI 설계 및 구현, 연락처 편집/추가/검색 기능, 커스텀 위젯(즐겨찾기, 다중 컬럼 검색 등) 담당
+
+---
+
+## 환경 설정 (.env 파일)
+
+1. **위치**: 실행 파일이 있는 디렉토리에 `.env` 파일을 생성해야 합니다
+   - Release 모드: `build/Qt${QT_VERSION_MAJOR}/Release/.env`
+   - Debug 모드: `build/Qt${QT_VERSION_MAJOR}/Debug/.env`
+   - 실행 파일과 동일한 디렉토리에 위치해야 앱이 자동으로 로드합니다
+
+2. **필수 환경변수**:
+   ```
+   AWS_LAMBDA_LOAD_URL="https://xxxxx.execute-api.region.amazonaws.com/stage/load"
+   AWS_LAMBDA_SAVE_URL="https://xxxxx.execute-api.region.amazonaws.com/stage/save"
+   AWS_LAMBDA_RESIZE_URL="https://xxxxx.execute-api.region.amazonaws.com/stage/resize"
+   ```
+
+3. **경로 관련 문제 해결**:
+   - `envloader.h`의 `EnvLoader::loadEnvironment()` 함수는 실행 파일의 디렉토리에서 `.env` 파일을 찾습니다
+   - 만약 `.env` 파일을 찾을 수 없다는 오류가 발생하면, 콘솔에 출력되는 현재 작업 디렉토리를 확인하고 해당 위치에 파일을 생성하세요
+   - Qt Creator에서 실행 시 작업 디렉토리가 빌드 디렉토리로 설정됩니다
+
+---
+
+## 즐겨찾기 기능
+
+- **표시 방법**: 연락처 목록의 하트 아이콘(❤)을 클릭하여 즐겨찾기 설정/해제
+- **데이터 저장**: 즐겨찾기 상태는 DynamoDB의 `favorite` 필드에 Boolean 값으로 저장됨
+- **UI 갱신**: 즐겨찾기 상태 변경 시 `dataChanged` 시그널 발생하여 UI 자동 갱신
+- **정렬 방법**: 테이블 헤더의 하트 아이콘(❤)을 클릭하면 즐겨찾기된 항목이 상단에 표시됨
+  - 즐겨찾기 열 헤더 클릭 → 즐겨찾기 항목 우선 정렬
+  - 다시 클릭 → 정렬 순서 반전 (즐겨찾기 아닌 항목 우선)
+
+---
+
+## 기술 아키텍처
+
+클라이언트 (Qt/C++) <───> API Gateway <───> AWS Lambda <───> DynamoDB/S3
+    │                                           │
+    │                                           │
+    └───────────────> 이미지 요청 <─────────────┘
+                      (S3 Direct)
+
+### 클라이언트 아키텍처 (MVC 패턴)
+- **Model**: AddressBookModel - 데이터 관리, AWS 연동
+- **View**: MainPageWidget, DetailPageWidget - 사용자 인터페이스
+- **Controller**: 각 위젯 내 이벤트 핸들러, 시그널-슬롯 연결
+
+### 서버 아키텍처
+- **API Gateway**: REST API 엔드포인트 제공 (CORS 활성화)
+- **Lambda 함수**: 데이터 처리 로직 (Node.js)
+- **DynamoDB**: 주소록 데이터 저장 (NoSQL)
+- **S3**: 프로필 이미지 저장 (원본 및 리사이징)
 
 ---
