@@ -3,7 +3,6 @@
 
 
 #include <QApplication>
-
 int main(int argc, char *argv[])
 {
     loadEnvFile();
@@ -11,6 +10,7 @@ int main(int argc, char *argv[])
     qDebug() << "AWS_LAMBDA_SAVE_URL:" << qgetenv("AWS_LAMBDA_SAVE_URL");
 
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/mainIcon/mainIcon/address-book.png"));
     Widget w;
     w.show();
 
