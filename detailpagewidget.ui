@@ -526,6 +526,19 @@ border: 0px;</string>
   <zorder>detailpageaddnewLabel</zorder>
   <zorder>formLayoutWidget</zorder>
  </widget>
+ <tabstops>
+  <tabstop>detailpageName</tabstop>
+  <tabstop>detailpageNickname</tabstop>
+  <tabstop>detailpagePosition</tabstop>
+  <tabstop>detailpagePhone</tabstop>
+  <tabstop>detailpageNotice</tabstop>
+  <tabstop>detailpageCompany</tabstop>
+  <tabstop>detailpageMail</tabstop>
+  <tabstop>detailpageaddnewButton</tabstop>
+  <tabstop>detailpageeditButton</tabstop>
+  <tabstop>detailpagesaveButton</tabstop>
+  <tabstop>detailpageexitButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

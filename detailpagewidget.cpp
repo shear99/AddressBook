@@ -58,6 +58,16 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     origMemoStyle = ui->detailpageNotice->styleSheet();
 
     modeSetting(m_isAddMode);
+    
+    // Set explicit tab order for form fields
+    if (m_isAddMode) {
+        QWidget::setTabOrder(ui->detailpageName, ui->detailpagePhone);
+        QWidget::setTabOrder(ui->detailpagePhone, ui->detailpagePosition);
+        QWidget::setTabOrder(ui->detailpagePosition, ui->detailpageNickname);
+        QWidget::setTabOrder(ui->detailpageNickname, ui->detailpageNotice);
+        QWidget::setTabOrder(ui->detailpageNotice, ui->detailpageCompany);
+        QWidget::setTabOrder(ui->detailpageCompany, ui->detailpageMail);
+    }
 }
 
 // 모델을 받는 생성자 구현
@@ -118,6 +128,16 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     origMemoStyle = ui->detailpageNotice->styleSheet();
 
     modeSetting(m_isAddMode);
+    
+    // Set explicit tab order for form fields
+    if (m_isAddMode) {
+        QWidget::setTabOrder(ui->detailpageName, ui->detailpagePhone);
+        QWidget::setTabOrder(ui->detailpagePhone, ui->detailpagePosition);
+        QWidget::setTabOrder(ui->detailpagePosition, ui->detailpageNickname);
+        QWidget::setTabOrder(ui->detailpageNickname, ui->detailpageNotice);
+        QWidget::setTabOrder(ui->detailpageNotice, ui->detailpageCompany);
+        QWidget::setTabOrder(ui->detailpageCompany, ui->detailpageMail);
+    }
 }
 
 // DB에서 이미지 URL 조회
