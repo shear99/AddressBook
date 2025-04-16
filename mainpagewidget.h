@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "addressbookmodel.h"
 #include "multicolumnfilterproxymodel.h"
+#include <Qt>
 
 namespace Ui {
 class MainPageWidget;

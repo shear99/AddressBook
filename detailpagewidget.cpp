@@ -14,6 +14,7 @@
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode)
     : QWidget(parent), m_entry(entry),ui(new Ui::DetailPageWidget),m_isAddMode(isAddMode)
 {
+
     // Initialize network manager for AWS communication
     m_networkManager = new QNetworkAccessManager(this);
     
@@ -21,7 +22,11 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     ui->setupUi(this);
     ui->detailpageImage->installEventFilter(this);
     ui->detailpageImage->setCursor(Qt::PointingHandCursor);
-    
+
+
+    //Font change
+    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
+
     // Initialize fields and load data
     populateFields();
     
@@ -78,7 +83,10 @@ DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, b
     ui->setupUi(this);
     ui->detailpageImage->installEventFilter(this);
     ui->detailpageImage->setCursor(Qt::PointingHandCursor);
-    
+
+    //Font change
+    FontUpdate::applyFontToAllChildren(this, ":/fonts/fonts/GmarketSansTTFMedium.ttf");
+
     // Initialize fields and load data
     populateFields();
     

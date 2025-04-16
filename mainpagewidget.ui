@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>835</width>
+    <height>610</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>835</width>
+    <height>610</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>835</width>
+    <height>610</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -16,8 +34,8 @@
   <widget class="QTableView" name="addressTableView">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>40</y>
+     <x>40</x>
+     <y>60</y>
      <width>750</width>
      <height>500</height>
     </rect>
@@ -26,10 +44,10 @@
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>581</x>
-     <y>530</y>
-     <width>191</width>
-     <height>80</height>
+     <x>630</x>
+     <y>20</y>
+     <width>151</width>
+     <height>42</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
@@ -38,15 +56,59 @@
     </property>
     <item>
      <widget class="QPushButton" name="addButton">
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	image: url(:/detailpageImage/detailpageImage/person_add_30dp_FFFFFF.png);
+    background-color: #222;         /* 진한 검정 배경 */
+    color: #fff;                    /* 흰색 글자 */
+    border: none;
+    border-radius: 8px;
+    font: bold 15px;
+	padding: 2px;
+    transition: background 0.2s;
+}
+
+QPushButton:hover {
+    background-color: #333;
+}
+
+QPushButton:pressed {
+    background-color: #111;
+    border-style: inset;
+}
+</string>
+      </property>
       <property name="text">
-       <string>추가</string>
+       <string/>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="deleteButton">
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	image: url(:/detailpageImage/detailpageImage/person_remove_30dp_FFFFFF.png);
+    background-color: #222;         /* 진한 검정 배경 */
+    color: #fff;                    /* 흰색 글자 */
+    border: none;
+    border-radius: 8px;
+    font: bold 15px;
+	padding: 2px;
+    transition: background 0.2s;
+}
+
+QPushButton:hover {
+    background-color: #333;
+}
+
+QPushButton:pressed {
+    background-color: #111;
+    border-style: inset;
+}
+</string>
+      </property>
       <property name="text">
-       <string>삭제</string>
+       <string/>
       </property>
      </widget>
     </item>
@@ -55,15 +117,16 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>40</x>
+     <y>30</y>
      <width>21</width>
      <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">image: url(:/mainpageImage/mainpageImage/search_30dp_000000.png);
-padding-left: 5px;</string>
+padding-left: 5px;
+padding-top:1px;</string>
    </property>
    <property name="text">
     <string/>
@@ -75,8 +138,8 @@ padding-left: 5px;</string>
   <widget class="QLineEdit" name="searchText">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>40</x>
+     <y>30</y>
      <width>121</width>
      <height>21</height>
     </rect>
