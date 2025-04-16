@@ -2,8 +2,8 @@
 #define MAINPAGEWIDGET_H
 
 #include <QWidget>
-#include "addressbookmodel.h"
-#include "multicolumnfilterproxymodel.h"
+#include "src/core/addressbookmodel.h"
+#include "src/core/multicolumnfilterproxymodel.h"
 #include <Qt>
 
 namespace Ui {

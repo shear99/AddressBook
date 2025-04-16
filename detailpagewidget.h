@@ -16,11 +16,11 @@
 #include <QDesktopServices>
 #include <QTimer>
 #include <QApplication>
-#include "addressentry.h"
-#include "fontupdate.h"
+#include "src/core/addressentry.h"
+#include "src/util/fontupdate.h"
 #include "ui_detailpagewidget.h"
 #include "loadingdialog.h"
-#include "addressbookmodel.h"
+#include "src/core/addressbookmodel.h"
 
 namespace Ui {
 class DetailPageWidget;

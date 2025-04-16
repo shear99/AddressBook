@@ -1,6 +1,6 @@
 #include <QMessageBox>
 #include <QCloseEvent>
-#include "util.h"
+#include "src/util/util.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QMessageBox>
@@ -10,6 +10,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include "detailpagewidget.h"
+#include "src/util/fontupdate.h"
 
 DetailPageWidget::DetailPageWidget(const AddressEntry& entry, QWidget* parent, bool isAddMode)
     : QWidget(parent), m_entry(entry),ui(new Ui::DetailPageWidget),m_isAddMode(isAddMode)

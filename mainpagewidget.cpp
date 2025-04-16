@@ -1,9 +1,9 @@
 #include "mainpagewidget.h"
 #include "ui_mainpagewidget.h"
-#include "addressbookmodel.h"
+#include "src/core/addressbookmodel.h"
 #include "detailpagewidget.h"
 #include "heartdelegate.h"
-#include "fontupdate.h"
+#include "src/util/fontupdate.h"
 
 #include <QHeaderView>
 #include <QMessageBox>

@@ -18,23 +18,23 @@ set(PROJECT_SOURCES
     widget.cpp
     widget.h
     widget.ui
-    addressbookmodel.cpp
-    addressbookmodel.h
+    src/core/addressbookmodel.cpp
+    src/core/addressbookmodel.h
     detailpagewidget.h
     detailpagewidget.cpp
     detailpagewidget.ui
-    addressentry.h
-    util.h
+    src/core/addressentry.h
+    src/util/util.h
     mainpagewidget.h
     mainpagewidget.cpp
     mainpagewidget.ui
-    fontupdate.h
-    fontupdate.cpp
-    ImageEntry.h
+    src/util/fontupdate.h
+    src/util/fontupdate.cpp
+    src/core/ImageEntry.h
     heartdelegate.h
     heartdelegate.cpp
     loadingdialog.h
-    multicolumnfilterproxymodel.h
+    src/core/multicolumnfilterproxymodel.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
