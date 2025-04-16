@@ -5,7 +5,6 @@
 #include <QStyleOptionButton>
 #include <QAbstractItemView>
 
-// Initialize the delegate with heart icons
 HeartDelegate::HeartDelegate(QObject* parent)
     : QStyledItemDelegate(parent),
     m_checkedIcon(":/asset/asset/yes.png"),    // Icon for favorite contacts
